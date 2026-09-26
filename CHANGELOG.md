@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-09-27
+
+- Document the official `wot` API version/namespace and contract review date separately from game and SDK versions.
+- Add the complete reference for all 68 catalog methods: every argument, constraint, signature, return shape, official link and instance/static example; include pagination and client/result helpers.
+- Generate documentation offline and verify every method example with mock transports in the test suite and CI. No runtime behavior changes.
+
 ## 1.0.0 — 2026-09-27
 
 - Initial PHP 8.5 World of Tanks SDK for EU, NA and ASIA, composing stable WgApi 2.x, WgDataGetter 2.x and WgAuth 1.x.

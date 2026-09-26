@@ -1,10 +1,12 @@
 """Generate explicit service/facade signatures from the reviewed, offline contract snapshot.
 
 Run with Python 3 from any directory. No network or API data is accessed.
-The generator owns Services/{group}.php, Facades/{group}.php and docs/ENDPOINTS.md.
+The generator owns Services/{group}.php, Facades/{group}.php, docs/ENDPOINTS.md
+and docs/METHODS.md (through generate-method-docs.py).
 Core classes, tests and Facades/Wot.php and Facades/Auth.php remain hand-written.
 """
 import json
+import runpy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,5 +139,13 @@ for section, (group, accessor) in GROUPS.items():
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text("\n".join(parts), encoding="utf-8")
 (ROOT / "docs").mkdir(exist_ok=True)
+table += ["", "Full parameters, results and examples: [method reference](METHODS.md).", "",
+          "| Auth API path | Instance / static method | Result |", "| --- | --- | --- |",
+          "| [auth/login](https://developers.wargaming.net/reference/all/wot/auth/login/) | `auth()->loginLocation()` / `Auth::loginLocation()` | Login URL |",
+          "| [auth/prolongate](https://developers.wargaming.net/reference/all/wot/auth/prolongate/) | `auth()->prolongate()` / `Auth::prolongate()` | AccessToken |",
+          "| [auth/logout](https://developers.wargaming.net/reference/all/wot/auth/logout/) | `auth()->logout()` / `Auth::logout()` | void |"]
 (ROOT / "docs/ENDPOINTS.md").write_text("\n".join(table) + "\n", encoding="utf-8")
+runpy.run_path(str(ROOT / "tools/generate-method-docs.py"), init_globals={
+    "ROOT": ROOT, "snapshot": snapshot, "GROUPS": GROUPS, "METHODS": METHODS, "parameter": parameter,
+})
 print("Generated eight services, eight static facades and endpoint coverage.")

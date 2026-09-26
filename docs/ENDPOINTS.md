@@ -71,3 +71,11 @@ Contract snapshot: 2026-09-27. Explicit PHP signatures are generated from the re
 | [ratings/accounts](https://developers.wargaming.net/reference/all/wot/ratings/accounts/) | `ratings()->accounts()` | — | 100 | Deprecated, opt-in |
 | [ratings/neighbors](https://developers.wargaming.net/reference/all/wot/ratings/neighbors/) | `ratings()->neighbors()` | — | — | Deprecated, opt-in |
 | [ratings/top](https://developers.wargaming.net/reference/all/wot/ratings/top/) | `ratings()->top()` | iterate/all | — | Deprecated, opt-in |
+
+Full parameters, results and examples: [method reference](METHODS.md).
+
+| Auth API path | Instance / static method | Result |
+| --- | --- | --- |
+| [auth/login](https://developers.wargaming.net/reference/all/wot/auth/login/) | `auth()->loginLocation()` / `Auth::loginLocation()` | Login URL |
+| [auth/prolongate](https://developers.wargaming.net/reference/all/wot/auth/prolongate/) | `auth()->prolongate()` / `Auth::prolongate()` | AccessToken |
+| [auth/logout](https://developers.wargaming.net/reference/all/wot/auth/logout/) | `auth()->logout()` / `Auth::logout()` | void |

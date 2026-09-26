@@ -31,4 +31,4 @@ jobs:
         run: |
           python3 tools/generate-endpoints.py
           composer format
-          git diff --exit-code -- src/Services src/Facades docs/ENDPOINTS.md
+          git diff --exit-code -- src/Services src/Facades docs/ENDPOINTS.md docs/METHODS.md
