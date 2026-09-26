@@ -1,0 +1,39 @@
+{
+    "name": "edrard/wotclient",
+    "description": "Typed World of Tanks API client with validation, ID batching and pagination for PHP 8.5",
+    "type": "library",
+    "license": "MIT",
+    "authors": [{ "name": "Edrard" }],
+    "homepage": "https://github.com/Edrard/WotClient",
+    "support": {
+        "source": "https://github.com/Edrard/WotClient",
+        "issues": "https://github.com/Edrard/WotClient/issues"
+    },
+    "repositories": [
+        { "type": "vcs", "url": "https://github.com/Edrard/WgApi.git" },
+        { "type": "vcs", "url": "https://github.com/Edrard/WgDataGetter.git" },
+        { "type": "vcs", "url": "https://github.com/Edrard/WgAuth.git" }
+    ],
+    "require": {
+        "php": "^8.5",
+        "edrard/wgapi": "^2.0",
+        "edrard/wggetter": "^2.0",
+        "edrard/wgauth": "^1.0",
+        "guzzlehttp/guzzle": "^7.10"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5",
+        "phpstan/phpstan": "^2.1",
+        "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "autoload": { "psr-4": { "edrard\\WotClient\\": "src/" } },
+    "autoload-dev": { "psr-4": { "edrard\\Tests\\WotClient\\": "tests/" } },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "format": "php-cs-fixer fix",
+        "format:check": "php-cs-fixer fix --dry-run --diff"
+    },
+    "config": { "sort-packages": true },
+    "extra": { "branch-alias": { "dev-main": "1.0.x-dev" } }
+}
