@@ -19,6 +19,7 @@ use edrard\WotClient\Contracts\RequestExecutorInterface;
 use edrard\WotClient\InvalidResponseException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Utils;
 use JsonException;
 use SensitiveParameter;
 use Throwable;
@@ -75,21 +76,23 @@ final class DefaultRequestExecutor implements RequestExecutorInterface
         $this->limiter->acquire(1);
         try {
             $response = $this->postClient->request('POST', $configuration->baseUrl($realm).'/wot/'.$path.'/', [
+                'query' => [], 'debug' => false,
                 'form_params' => $parameters, 'timeout' => 15, 'connect_timeout' => 5,
                 'verify' => true, 'allow_redirects' => false, 'http_errors' => false,
                 'headers' => ['Accept' => 'application/json'],
             ]);
             $status = $response->getStatusCode();
-            $body = $response->getBody()->read(8388609);
+            $stream = $response->getBody();
+            if ($stream->isSeekable()) {
+                $stream->rewind();
+            }
+            $body = Utils::copyToString($stream);
         } catch (Throwable) {
             // Guzzle exceptions retain requests and credentials; never chain them.
             throw new ClientException('WG POST transport failed; the outcome may be unknown.');
         }
         if ($status < 200 || $status >= 300) {
             throw new ClientException('WG POST HTTP request failed.', httpStatus: $status);
-        }
-        if (strlen($body) > 8388608) {
-            throw new InvalidResponseException();
         }
         try {
             $envelope = json_decode($body, true, 64, JSON_THROW_ON_ERROR);

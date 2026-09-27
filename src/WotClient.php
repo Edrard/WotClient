@@ -173,8 +173,12 @@ final class WotClient
             $page = $startPage + $offset;
             $result = $this->request($path, array_replace($parameters, ['page_no' => $page]), $accessToken);
             $total = $result->meta['page_total'] ?? null;
-            $reportedPage = $result->meta['page_no'] ?? $page;
-            if (!is_int($reportedPage) || $reportedPage !== $page || ($total !== null && (!is_int($total) || $total < 0))) {
+            foreach (['page_no', 'page'] as $field) {
+                if (array_key_exists($field, $result->meta) && $result->meta[$field] !== $page) {
+                    throw new InvalidResponseException();
+                }
+            }
+            if ($total !== null && (!is_int($total) || $total < 0)) {
                 throw new InvalidResponseException();
             }
             if ($result->count() === 0) {

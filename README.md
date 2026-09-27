@@ -162,7 +162,7 @@ RequestExecutorInterface is the transport boundary for test doubles and custom i
 
 Invalid arguments raise InvalidArgumentException. Provider, transport and pagination failures raise ClientException; invalid responses raise InvalidResponseException. Numeric providerCode/httpStatus are safe diagnostics. Default exceptions omit credentials, URLs, raw bodies and provider messages; credential-bearing transport exceptions are never chained. GET uses WgDataGetter's bounded retry policy; POST has no automatic retry. Timeouts are 15 seconds overall and 5 seconds to connect, TLS verification is enabled, redirects disabled. Custom executors must preserve these credential and mutation guarantees.
 
-The default POST transport limits response bodies to 8 MiB; use fields to restrict large responses. Custom transports can provide a different bounded policy.
+The current development version (see CHANGELOG.md, Unreleased) reads complete POST response bodies without a package-defined byte limit. Injected Guzzle query defaults are cleared and transport debug is disabled. The directly used guzzlehttp/psr7 dependency (MIT) provides the stream-reading utilities. Custom transports/middleware must preserve credential protections.
 
 ## Development and examples
 

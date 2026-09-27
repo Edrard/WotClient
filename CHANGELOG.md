@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — planned 1.0.2
+
+- Remove the previous 8 MiB POST response cap and read complete bodies, including short stream reads, without a package-defined size limit.
+- Clear injected Guzzle query defaults and disable inherited debug output to keep credentials out of URLs and transport logs.
+- Validate both page/page_no metadata and reject scalar lists where a record object is expected.
+- Declare the directly used PSR-7 dependency and add security regressions; retain explicit POST operations without retries.
+
 ## 1.0.1 — 2026-09-27
 
 - Document the official `wot` API version/namespace and contract review date separately from game and SDK versions.

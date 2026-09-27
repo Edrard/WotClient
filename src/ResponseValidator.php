@@ -61,6 +61,9 @@ final class ResponseValidator
      */
     private function record(array $record, array $fields): void
     {
+        if ($record !== [] && array_is_list($record)) {
+            throw new InvalidResponseException();
+        }
         foreach ($fields as $name => $type) {
             $this->field($record, explode('.', $name), $type);
         }
