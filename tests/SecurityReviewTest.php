@@ -19,6 +19,29 @@ use PHPUnit\Framework\TestCase;
 
 final class SecurityReviewTest extends TestCase
 {
+    public function testRejectedRawTokenCannotLeakThroughParameterValidationTrace(): void
+    {
+        $previous = ini_set('zend.exception_ignore_args', '0');
+        try {
+            foreach (['request', 'prepare'] as $method) {
+                $executor = new RecordingExecutor();
+                $client = new WotClient('fixture', executor: $executor);
+                try {
+                    $client->$method('account/info', ['account_id' => [42], 'access_token' => 'synthetic-trace-secret']);
+                    self::fail('Reserved raw token accepted.');
+                } catch (\InvalidArgumentException $exception) {
+                    $frames = array_values(array_filter($exception->getTrace(), static fn (array $frame): bool => ($frame['class'] ?? null) === \edrard\WotClient\ParameterValidator::class && $frame['function'] === 'validate'));
+                    self::assertCount(1, $frames);
+                    self::assertInstanceOf(\SensitiveParameterValue::class, $frames[0]['args'][1]);
+                    self::assertStringNotContainsString('synthetic-trace-secret', var_export($exception->getTrace(), true));
+                    self::assertSame([], $executor->calls);
+                }
+            }
+        } finally {
+            ini_set('zend.exception_ignore_args', $previous);
+        }
+    }
+
     public function testWrongReportedPageCannotPassPaginationValidation(): void
     {
         $client = new WotClient('fixture', executor: new RecordingExecutor(static fn () => [

@@ -2,11 +2,11 @@
 
 Explicit typed methods for WoT EU, NA and ASIA, response validation, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
 
-WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.1+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
+WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.2+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
 
 ## API version and documentation
 
-**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.1.2.**
+**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.1.3.**
 
 WG's [request format guide](https://developers.wargaming.net/documentation/guide/getting-started/#request-format) defines the API_name URL segment as the API version; the reviewed World of Tanks methods use `wot`. The reviewed contracts do not expose a separate numeric API version. This identifier is separate from the game version returned by encyclopedia/info and this library's semantic version.
 
@@ -16,7 +16,7 @@ The [complete method reference](docs/METHODS.md) documents **all 68 available ca
 
 ## Installation
 
-Composer package: `edrard/wotclient`; stable constraint: `^1.1`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
+Composer package: `edrard/wotclient`; stable constraint: `^1.1.3`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
 
 Until registration on Packagist, declare **all four repositories in the consuming application's root composer.json**. Composer does not inherit repositories from dependencies:
 
@@ -28,11 +28,11 @@ Until registration on Packagist, declare **all four repositories in the consumin
         { "type": "vcs", "url": "https://github.com/Edrard/WgDataGetter.git" },
         { "type": "vcs", "url": "https://github.com/Edrard/WgAuth.git" }
     ],
-    "require": { "php": "^8.5", "edrard/wotclient": "^1.1" }
+    "require": { "php": "^8.5", "edrard/wotclient": "^1.1.3" }
 }
 ```
 
-Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.1.2`; production builds should resolve versioned sources.
+Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.1.3`; production builds should resolve versioned sources.
 
 ## Instance client
 
@@ -225,3 +225,7 @@ The reviewed resources/endpoints.json snapshot contains factual paths, parameter
 Tests use fixtures and mock transports, including routing all 65 data methods through both instance and static APIs. Live verification covers the methods printed by verify-regions.php; it does not prove every catalog endpoint is available. Real user callback, private access, renewal/revocation and reserve activation are not claimed as live-verified. Intended consumers: explicitly integrated PHP applications and the future Laravel website; no website integration or deployment has been performed.
 
 Official sources: [WoT reference](https://developers.wargaming.net/reference/all/wot/account/list/), [application identification and quotas](https://developers.wargaming.net/documentation/guide/principles/). Source repository: [Edrard/WotClient](https://github.com/Edrard/WotClient); license: [MIT](LICENSE).
+
+Dependency updates: run `composer update "edrard/*" --with-all-dependencies --prefer-stable` in the consuming application to upgrade the WG complex to the latest versions allowed by its constraints. Caret constraints allow compatible upgrades; `composer install` preserves the lock file. Dependency repositories must be declared in the application root.
+
+Parameter validation marks its parameter array SensitiveParameter, including rejected raw access_token input, so validation exception traces redact it when zend.exception_ignore_args=0.

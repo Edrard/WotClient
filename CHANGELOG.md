@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3 - 2026-09-28
+
+- Protect parameter arrays in validation stack traces, including rejected raw access tokens.
+- Require WgAuth ^1.0.2 and test request/preparation failures with exception arguments enabled.
+- Refresh all dependencies to the latest compatible stable versions.
+
 ## 1.1.2 — 2026-09-28
 
 - Require WgAuth ^1.0.1 so installations include cleared inherited POST query defaults, disabled debug output and complete authentication response reads without the former byte cap.

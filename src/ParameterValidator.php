@@ -15,7 +15,7 @@ final class ParameterValidator
      * @param array<string, mixed> $parameters
      * @return array<string, mixed>
      */
-    public function validate(array $endpoint, array $parameters): array
+    public function validate(array $endpoint, #[\SensitiveParameter] array $parameters): array
     {
         $schemas = $endpoint['parameters'];
         foreach ($parameters as $name => $value) {

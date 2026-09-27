@@ -18,7 +18,7 @@
         "php": "^8.5",
         "edrard/wgapi": "^2.0",
         "edrard/wggetter": "^2.1",
-        "edrard/wgauth": "^1.0.1",
+        "edrard/wgauth": "^1.0.2",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.11"
     },
