@@ -93,6 +93,96 @@ final class WotClient
      */
     public function request(string $path, #[SensitiveParameter] array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null): ApiResult
     {
+        [$endpoint, $batches] = $this->plan($path, $parameters, $accessToken);
+        $parts = [];
+        foreach ($batches as $batch) {
+            $value = $this->responses->validate($endpoint, $this->executor->execute($this->realm, $path, $batch, $accessToken, $endpoint['write']));
+            $this->combine($endpoint, [$batch], [$value]);
+            $parts[] = $value;
+        }
+        return $this->combine($endpoint, $batches, $parts);
+    }
+
+    /** @param array<string, mixed> $parameters */
+    public function prepare(string $path, #[SensitiveParameter] array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null): PreparedOperation
+    {
+        [$endpoint, , $parameters] = $this->plan($path, $parameters, $accessToken);
+        if ($endpoint['write']) {
+            throw new InvalidArgumentException('Concurrent operations are read-only; use the existing write method.');
+        }
+        return new PreparedOperation($this->realm, $path, $parameters, $accessToken);
+    }
+
+    /**
+     * @param array<int|string, PreparedOperation> $operations
+     * @return array<int|string, OperationOutcome>
+     */
+    public function executeMany(#[SensitiveParameter] array $operations, int $concurrency = 10): array
+    {
+        if ($concurrency < 1 || $concurrency > 10) {
+            throw new InvalidArgumentException('Concurrency must be between 1 and 10.');
+        }
+        if ($operations === []) {
+            return [];
+        }
+        if (!$this->executor instanceof \edrard\WotClient\Contracts\BatchRequestExecutorInterface) {
+            throw new \LogicException('The injected executor does not support concurrent execution.');
+        }
+        $requests = [];
+        $plans = [];
+        foreach ($operations as $key => $operation) {
+            $client = $this->forRealm($operation->realm);
+            [$endpoint, $batches] = $client->plan($operation->path, $operation->parameters(), $operation->token());
+            if ($endpoint['write']) {
+                throw new InvalidArgumentException('Concurrent operations are read-only.');
+            }
+            $indices = [];
+            foreach ($batches as $batch) {
+                $indices[] = count($requests);
+                $requests[] = new PreparedOperation($operation->realm, $operation->path, $batch, $operation->token());
+            }
+            $plans[$key] = [$endpoint, $batches, $indices];
+        }
+        $outcomes = $this->executor->executeMany($requests, $concurrency);
+        if (array_keys($outcomes) !== array_keys($requests)) {
+            throw new ClientException('Batch executor did not preserve request identities.');
+        }
+        $result = [];
+        foreach ($plans as $key => [$endpoint, $batches, $indices]) {
+            $parts = [];
+            $values = [];
+            $failure = null;
+            foreach ($indices as $i) {
+                $outcome = $outcomes[$i];
+                if (!$outcome->succeeded()) {
+                    $error = $outcome->failure;
+                    $partFailure = new OperationFailure($error->kind, $error->code, $error->retryable, $outcome->attempts, $error->retryAfter);
+                    $parts[] = new OperationOutcome(null, $partFailure);
+                    $failure ??= $partFailure;
+                    continue;
+                }
+                try {
+                    $value = $this->responses->validate($endpoint, $outcome->envelope());
+                    $this->combine($endpoint, [$batches[count($parts)]], [$value]);
+                    $values[] = $value;
+                    $parts[] = new OperationOutcome($value);
+                } catch (ClientException $error) {
+                    $partFailure = new OperationFailure('invalid_response', $error->providerCode, attempts: $outcome->attempts);
+                    $parts[] = new OperationOutcome(null, $partFailure);
+                    $failure ??= $partFailure;
+                }
+            }
+            $result[$key] = $failure === null ? new OperationOutcome($this->combine($endpoint, $batches, $values), parts: $parts) : new OperationOutcome(null, $failure, $parts);
+        }
+        return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     * @return array{array<string, mixed>, list<array<string, mixed>>, array<string, mixed>}
+     */
+    private function plan(string $path, #[SensitiveParameter] array $parameters, #[SensitiveParameter] ?AccessToken $accessToken): array
+    {
         $endpoint = $this->registry->get($path);
         if (!in_array($this->realm->value, $endpoint['realms'], true)) {
             throw new InvalidArgumentException('This endpoint is unavailable in the selected realm.');
@@ -120,35 +210,37 @@ final class WotClient
                 $batches[] = array_replace($parameters, [$batchParameter => $chunk]);
             }
         }
+        return [$endpoint, $batches, $parameters];
+    }
+
+    /**
+     * @param array<string, mixed> $endpoint
+     * @param list<array<string, mixed>> $batches
+     * @param list<ApiResult> $parts
+     */
+    private function combine(array $endpoint, #[SensitiveParameter] array $batches, array $parts): ApiResult
+    {
         $data = [];
         $metadata = [];
-        $single = null;
-        foreach ($batches as $batch) {
-            $envelope = $this->executor->execute($this->realm, $path, $batch, $accessToken, $endpoint['write']);
-            $result = $this->responses->validate($endpoint, $envelope);
+        foreach ($parts as $i => $result) {
+            $batchParameter = $endpoint['batchParameter'];
             if ($batchParameter !== null) {
                 $values = $result->data();
-                if ($values === null || array_diff(array_keys($values), $batch[$batchParameter]) !== [] || array_diff($batch[$batchParameter], array_keys($values)) !== []) {
+                $ids = $batches[$i][$batchParameter];
+                if ($values === null || array_diff(array_keys($values), $ids) !== [] || array_diff($ids, array_keys($values)) !== []) {
                     throw new InvalidResponseException();
                 }
                 foreach ($values as $key => $value) {
-                    if (array_key_exists($key, $data)) {
+                    if (array_key_exists($key, $data) || (is_array($value) && isset($value[$batchParameter]) && $value[$batchParameter] !== (int) $key)) {
                         throw new InvalidResponseException();
-                    }
-                    if (is_array($value)) {
-                        $identity = $batchParameter;
-                        if (isset($value[$identity]) && $value[$identity] !== (int) $key) {
-                            throw new InvalidResponseException();
-                        }
                     }
                     $data[$key] = $value;
                 }
             }
             $metadata[] = $result->meta;
-            $single = $result;
         }
-        if (count($batches) === 1) {
-            return $single;
+        if (count($parts) === 1) {
+            return $parts[0];
         }
         return new ApiResult($data, ['count' => count($data), 'batches' => $metadata]);
     }

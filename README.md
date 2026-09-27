@@ -1,8 +1,39 @@
 # WotClient — World of Tanks API for PHP 8.5
 
+## Multiget
+
+```php
+$operations = [
+    'profiles' => $client->accounts()->prepareInfo($accountIds),
+    'vehicles' => $client->accounts()->prepareTanks($accountIds),
+    'achievements' => $client->accounts()->prepareAchievements($accountIds),
+];
+$outcomes = $client->executeMany($operations, concurrency: 10);
+foreach ($outcomes as $name => $outcome) {
+    if ($outcome->succeeded()) {
+        $data = $outcome->result()->data();
+        continue;
+    }
+    $failure = $outcome->failure; // kind, providerCode, retryable, attempts, retryAfter
+    foreach ($outcome->parts as $part) {
+        if ($part->succeeded()) {
+            $completedChunk = $part->result()->data();
+        }
+    }
+}
+```
+
+Every read method has a `prepare…()` counterpart with identical typed arguments, including static group facades. Preparation validates without network I/O. `Wot::executeMany($operations, concurrency: 10)` uses the configured client. Operations retain their realm and may mix EU, NA and ASIA. See the [complete method reference](docs/METHODS.md) for each preparation example. A prepared paginated method fetches one page; existing pagination helpers remain available.
+
+The client splits required ID lists at each endpoint's provider limit, then submits all HTTP chunks to one shared WgDataGetter queue. Concurrency (1–10) bounds actual HTTP requests across operations and chunks. WgDataGetter alone owns transport retries, retrying only transient failed GET requests. Outcomes preserve caller keys/order. Failed operations retain successful chunks in `parts`; `result()` never returns incomplete data as a successful complete result. Invalid preparation fails before I/O. Infrastructure exceptions may still propagate.
+
+Synchronous RequestExecutorInterface implementations remain supported. Custom multiget executors implement BatchRequestExecutorInterface; injected getters implement SettledDataGetterInterface. Provider writes and authentication retain their existing explicit methods.
+
+Private multiget reads accept a verified WgAuth AccessToken and use authenticated HTTPS GET through WgDataGetter. Tokens can therefore appear in transport URLs: do not log raw parameters, URLs or private responses. Library debug output and failures redact credentials. Synchronous token requests still use POST. Responses have no package-defined size cap.
+
 Explicit typed methods for WoT EU, NA and ASIA, response validation, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
 
-WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.x (GET transport, WG envelopes and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.x (authentication). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser is a separate collection/processing/persistence pipeline and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
+WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.x (authentication). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
 
 ## API version and documentation
 

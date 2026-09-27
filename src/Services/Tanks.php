@@ -6,6 +6,7 @@ namespace edrard\WotClient\Services;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -29,6 +30,35 @@ final readonly class Tanks extends Service
         string|null $inGarage = null,
     ): ApiResult {
         return $this->client->request(
+            'tanks/stats',
+            [
+                'account_id' => $accountId,
+                'language' => $language,
+                'fields' => $fields,
+                'extra' => $extra,
+                'tank_id' => $tankIds,
+                'in_garage' => $inGarage,
+            ],
+            $accessToken,
+        );
+    }
+
+    /**
+     * tanks/stats; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     * @param list<string> $extra
+     * @param list<int> $tankIds
+     */
+    public function prepareStats(
+        int $accountId,
+        string|null $language = null,
+        array $fields = [],
+        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        array $extra = [],
+        array $tankIds = [],
+        string|null $inGarage = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'tanks/stats',
             [
                 'account_id' => $accountId,
@@ -69,6 +99,32 @@ final readonly class Tanks extends Service
     }
 
     /**
+     * tanks/achievements; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     * @param list<int> $tankIds
+     */
+    public function prepareAchievements(
+        int $accountId,
+        string|null $language = null,
+        array $fields = [],
+        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        array $tankIds = [],
+        string|null $inGarage = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
+            'tanks/achievements',
+            [
+                'account_id' => $accountId,
+                'language' => $language,
+                'fields' => $fields,
+                'tank_id' => $tankIds,
+                'in_garage' => $inGarage,
+            ],
+            $accessToken,
+        );
+    }
+
+    /**
      * tanks/mastery; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<int> $percentile
      * @param list<string> $fields
@@ -82,6 +138,32 @@ final readonly class Tanks extends Service
         array $tankIds = [],
     ): ApiResult {
         return $this->client->request(
+            'tanks/mastery',
+            [
+                'distribution' => $distribution,
+                'percentile' => $percentile,
+                'language' => $language,
+                'fields' => $fields,
+                'tank_id' => $tankIds,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * tanks/mastery; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $percentile
+     * @param list<string> $fields
+     * @param list<int> $tankIds
+     */
+    public function prepareMastery(
+        string $distribution,
+        array $percentile,
+        string|null $language = null,
+        array $fields = [],
+        array $tankIds = [],
+    ): PreparedOperation {
+        return $this->client->prepare(
             'tanks/mastery',
             [
                 'distribution' => $distribution,

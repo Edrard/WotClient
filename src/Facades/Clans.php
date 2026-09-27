@@ -6,6 +6,7 @@ namespace edrard\WotClient\Facades;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -25,6 +26,20 @@ final class Clans
         int|null $pageNo = null,
     ): ApiResult {
         return Wot::client()->clans()->search($language, $fields, $search, $limit, $pageNo);
+    }
+
+    /**
+     * clans/list; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public static function prepareSearch(
+        string|null $language = null,
+        array $fields = [],
+        string|null $search = null,
+        int|null $limit = null,
+        int|null $pageNo = null,
+    ): PreparedOperation {
+        return Wot::client()->clans()->prepareSearch($language, $fields, $search, $limit, $pageNo);
     }
 
     /**
@@ -83,6 +98,30 @@ final class Clans
     }
 
     /**
+     * clans/info; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $clanIds
+     * @param list<string> $fields
+     * @param list<string> $extra
+     */
+    public static function prepareInfo(
+        array $clanIds,
+        string|null $language = null,
+        array $fields = [],
+        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        array $extra = [],
+        string|null $membersKey = null,
+    ): PreparedOperation {
+        return Wot::client()->clans()->prepareInfo(
+            $clanIds,
+            $language,
+            $fields,
+            $accessToken,
+            $extra,
+            $membersKey,
+        );
+    }
+
+    /**
      * clans/accountinfo; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<int> $accountIds
      * @param list<string> $fields
@@ -90,6 +129,19 @@ final class Clans
     public static function accountInfo(array $accountIds, string|null $language = null, array $fields = []): ApiResult
     {
         return Wot::client()->clans()->accountInfo($accountIds, $language, $fields);
+    }
+
+    /**
+     * clans/accountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $accountIds
+     * @param list<string> $fields
+     */
+    public static function prepareAccountInfo(
+        array $accountIds,
+        string|null $language = null,
+        array $fields = [],
+    ): PreparedOperation {
+        return Wot::client()->clans()->prepareAccountInfo($accountIds, $language, $fields);
     }
 
     /**
@@ -102,6 +154,15 @@ final class Clans
     }
 
     /**
+     * clans/glossary; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public static function prepareGlossary(string|null $language = null, array $fields = []): PreparedOperation
+    {
+        return Wot::client()->clans()->prepareGlossary($language, $fields);
+    }
+
+    /**
      * clans/messageboard; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<string> $fields
      */
@@ -111,12 +172,35 @@ final class Clans
     }
 
     /**
+     * clans/messageboard; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public static function prepareMessageboard(
+        #[SensitiveParameter] AccessToken $accessToken,
+        array $fields = [],
+    ): PreparedOperation {
+        return Wot::client()->clans()->prepareMessageboard($accessToken, $fields);
+    }
+
+    /**
      * clans/memberhistory; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<string> $fields
      */
     public static function memberHistory(int $accountId, string|null $language = null, array $fields = []): ApiResult
     {
         return Wot::client()->clans()->memberHistory($accountId, $language, $fields);
+    }
+
+    /**
+     * clans/memberhistory; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public static function prepareMemberHistory(
+        int $accountId,
+        string|null $language = null,
+        array $fields = [],
+    ): PreparedOperation {
+        return Wot::client()->clans()->prepareMemberHistory($accountId, $language, $fields);
     }
 
 }

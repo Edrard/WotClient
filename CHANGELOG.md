@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased — planned 1.0.2
+## 1.1.0 — 2026-09-27
+
+- Add immutable PreparedOperation, prepare methods for all 64 read endpoints on instance/static services, and keyed executeMany outcomes.
+- Flatten endpoint-limit chunks across operations/realms into the WgDataGetter 2.1 multiget queue; leave HTTP concurrency and retries in the getter.
+- Validate each response and ID mapping independently; retain successful parts of partially failed operations without exposing an incomplete overall result as success.
+- Add BatchRequestExecutorInterface without changing synchronous executor contracts; preserve explicit auth/write methods and existing pagination.
+- Document every preparation method with examples; verify actual Guzzle concurrency, complete merging, partial failures, realm routing and early write rejection.
 
 - Remove the previous 8 MiB POST response cap and read complete bodies, including short stream reads, without a package-defined size limit.
 - Clear injected Guzzle query defaults and disable inherited debug output to keep credentials out of URLs and transport logs.

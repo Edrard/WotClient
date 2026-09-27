@@ -6,6 +6,7 @@ namespace edrard\WotClient\Services;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -25,6 +26,30 @@ final readonly class Accounts extends Service
         int|null $limit = null,
     ): ApiResult {
         return $this->client->request(
+            'account/list',
+            [
+                'search' => $search,
+                'language' => $language,
+                'fields' => $fields,
+                'type' => $type,
+                'limit' => $limit,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * account/list; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public function prepareSearch(
+        string $search,
+        string|null $language = null,
+        array $fields = [],
+        string|null $type = null,
+        int|null $limit = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'account/list',
             [
                 'search' => $search,
@@ -63,6 +88,31 @@ final readonly class Accounts extends Service
     }
 
     /**
+     * account/info; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $accountIds
+     * @param list<string> $fields
+     * @param list<string> $extra
+     */
+    public function prepareInfo(
+        array $accountIds,
+        string|null $language = null,
+        array $fields = [],
+        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        array $extra = [],
+    ): PreparedOperation {
+        return $this->client->prepare(
+            'account/info',
+            [
+                'account_id' => $accountIds,
+                'language' => $language,
+                'fields' => $fields,
+                'extra' => $extra,
+            ],
+            $accessToken,
+        );
+    }
+
+    /**
      * account/tanks; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<int> $accountIds
      * @param list<string> $fields
@@ -76,6 +126,31 @@ final readonly class Accounts extends Service
         array $tankIds = [],
     ): ApiResult {
         return $this->client->request(
+            'account/tanks',
+            [
+                'account_id' => $accountIds,
+                'language' => $language,
+                'fields' => $fields,
+                'tank_id' => $tankIds,
+            ],
+            $accessToken,
+        );
+    }
+
+    /**
+     * account/tanks; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $accountIds
+     * @param list<string> $fields
+     * @param list<int> $tankIds
+     */
+    public function prepareTanks(
+        array $accountIds,
+        string|null $language = null,
+        array $fields = [],
+        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        array $tankIds = [],
+    ): PreparedOperation {
+        return $this->client->prepare(
             'account/tanks',
             [
                 'account_id' => $accountIds,
@@ -106,6 +181,24 @@ final readonly class Accounts extends Service
     }
 
     /**
+     * account/achievements; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $accountIds
+     * @param list<string> $fields
+     */
+    public function prepareAchievements(array $accountIds, string|null $language = null, array $fields = []): PreparedOperation
+    {
+        return $this->client->prepare(
+            'account/achievements',
+            [
+                'account_id' => $accountIds,
+                'language' => $language,
+                'fields' => $fields,
+            ],
+            null,
+        );
+    }
+
+    /**
      * account/wtr; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<int> $accountIds
      * @param list<string> $fields
@@ -113,6 +206,24 @@ final readonly class Accounts extends Service
     public function wtr(array $accountIds, string|null $language = null, array $fields = []): ApiResult
     {
         return $this->client->request(
+            'account/wtr',
+            [
+                'account_id' => $accountIds,
+                'language' => $language,
+                'fields' => $fields,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * account/wtr; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $accountIds
+     * @param list<string> $fields
+     */
+    public function prepareWtr(array $accountIds, string|null $language = null, array $fields = []): PreparedOperation
+    {
+        return $this->client->prepare(
             'account/wtr',
             [
                 'account_id' => $accountIds,

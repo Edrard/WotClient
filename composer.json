@@ -17,7 +17,7 @@
     "require": {
         "php": "^8.5",
         "edrard/wgapi": "^2.0",
-        "edrard/wggetter": "^2.0",
+        "edrard/wggetter": "^2.1",
         "edrard/wgauth": "^1.0",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.11"
@@ -36,5 +36,5 @@
         "format:check": "php-cs-fixer fix --dry-run --diff"
     },
     "config": { "sort-packages": true },
-    "extra": { "branch-alias": { "dev-main": "1.0.x-dev" } }
+    "extra": { "branch-alias": { "dev-main": "1.1.x-dev" } }
 }

@@ -78,10 +78,23 @@ final class ServiceCoverageTest extends TestCase
             };
         }
         $instanceResult = $service->$method(...$arguments);
+        if ($path !== 'stronghold/activateclanreserve') {
+            $prepare = 'prepare'.ucfirst($method);
+            $operation = $service->$prepare(...$arguments);
+            self::assertSame($path, $operation->path);
+            self::assertSame($executor->calls[0]['parameters'], $operation->parameters());
+            self::assertCount(1, $executor->calls);
+        }
         Wot::configure($client);
         try {
             $facadeClass = 'edrard\\WotClient\\Facades\\'.$class;
             $staticResult = $facadeClass::$method(...$arguments);
+            if ($path !== 'stronghold/activateclanreserve') {
+                $prepared = $facadeClass::$prepare(...$arguments);
+                self::assertSame($operation->path, $prepared->path);
+                self::assertSame($operation->parameters(), $prepared->parameters());
+                self::assertCount(2, $executor->calls);
+            }
         } finally {
             Wot::reset();
         }

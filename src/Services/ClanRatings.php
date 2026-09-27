@@ -6,6 +6,7 @@ namespace edrard\WotClient\Services;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -19,6 +20,19 @@ final readonly class ClanRatings extends Service
     public function types(): ApiResult
     {
         return $this->client->request(
+            'clanratings/types',
+            [
+            ],
+            null,
+        );
+    }
+
+    /**
+     * clanratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     */
+    public function prepareTypes(): PreparedOperation
+    {
+        return $this->client->prepare(
             'clanratings/types',
             [
             ],
@@ -41,6 +55,20 @@ final readonly class ClanRatings extends Service
     }
 
     /**
+     * clanratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     */
+    public function prepareDates(int|null $limit = null): PreparedOperation
+    {
+        return $this->client->prepare(
+            'clanratings/dates',
+            [
+                'limit' => $limit,
+            ],
+            null,
+        );
+    }
+
+    /**
      * clanratings/clans; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<int> $clanIds
      * @param list<string> $fields
@@ -52,6 +80,29 @@ final readonly class ClanRatings extends Service
         int|string|null $date = null,
     ): ApiResult {
         return $this->client->request(
+            'clanratings/clans',
+            [
+                'clan_id' => $clanIds,
+                'language' => $language,
+                'fields' => $fields,
+                'date' => $date,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * clanratings/clans; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $clanIds
+     * @param list<string> $fields
+     */
+    public function prepareClans(
+        array $clanIds,
+        string|null $language = null,
+        array $fields = [],
+        int|string|null $date = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'clanratings/clans',
             [
                 'clan_id' => $clanIds,
@@ -90,6 +141,32 @@ final readonly class ClanRatings extends Service
     }
 
     /**
+     * clanratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public function prepareNeighbors(
+        string $rankField,
+        int $clanId,
+        string|null $language = null,
+        array $fields = [],
+        int|string|null $date = null,
+        int|null $limit = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
+            'clanratings/neighbors',
+            [
+                'rank_field' => $rankField,
+                'clan_id' => $clanId,
+                'language' => $language,
+                'fields' => $fields,
+                'date' => $date,
+                'limit' => $limit,
+            ],
+            null,
+        );
+    }
+
+    /**
      * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<string> $fields
      */
@@ -102,6 +179,32 @@ final readonly class ClanRatings extends Service
         int|null $limit = null,
     ): ApiResult {
         return $this->client->request(
+            'clanratings/top',
+            [
+                'rank_field' => $rankField,
+                'language' => $language,
+                'fields' => $fields,
+                'date' => $date,
+                'page_no' => $pageNo,
+                'limit' => $limit,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public function prepareTop(
+        string $rankField,
+        string|null $language = null,
+        array $fields = [],
+        int|string|null $date = null,
+        int|null $pageNo = null,
+        int|null $limit = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'clanratings/top',
             [
                 'rank_field' => $rankField,

@@ -15,7 +15,10 @@ use edrard\WgGetter\Exceptions\RequestException;
 use edrard\WgGetter\WgDataGetter;
 use edrard\WgGetter\IntervalRateLimiter;
 use edrard\WotClient\ClientException;
-use edrard\WotClient\Contracts\RequestExecutorInterface;
+use edrard\WotClient\Contracts\BatchRequestExecutorInterface;
+use edrard\WgGetter\Contracts\SettledDataGetterInterface;
+use edrard\WotClient\PreparedOperation;
+use edrard\WgGetter\RequestOutcome;
 use edrard\WotClient\InvalidResponseException;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -24,7 +27,7 @@ use JsonException;
 use SensitiveParameter;
 use Throwable;
 
-final class DefaultRequestExecutor implements RequestExecutorInterface
+final class DefaultRequestExecutor implements BatchRequestExecutorInterface
 {
     private GetWgApi $urls;
     private DataGetterInterface $getter;
@@ -103,6 +106,32 @@ final class DefaultRequestExecutor implements RequestExecutorInterface
             throw new InvalidResponseException();
         }
         return $envelope;
+    }
+
+    /** @param list<PreparedOperation> $requests @return array<int, RequestOutcome> */
+    public function executeMany(#[SensitiveParameter] array $requests, int $concurrency): array
+    {
+        if (!$this->getter instanceof SettledDataGetterInterface) {
+            throw new \LogicException('The getter does not support settled multiget.');
+        }
+        $this->getter->cleanUrls();
+        try {
+            $urls = [];
+            foreach ($requests as $key => $request) {
+                $parameters = $request->parameters();
+                $parameters['language'] ??= $this->language;
+                $token = $request->token();
+                if ($token !== null) {
+                    $parameters['access_token'] = $token->value();
+                }
+                [$section, $method] = explode('/', $request->path, 2);
+                $urls[$key] = $this->urls->getUrl($request->realm->value, 'wot/'.$section, $method, $parameters);
+            }
+            $this->getter->setUrls($urls);
+            return $this->getter->getEnvelopeOutcomes($concurrency);
+        } finally {
+            $this->getter->cleanUrls();
+        }
     }
 
     /** @return array<string, string> */

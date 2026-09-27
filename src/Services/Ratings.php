@@ -6,6 +6,7 @@ namespace edrard\WotClient\Services;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -21,6 +22,27 @@ final readonly class Ratings extends Service
     public function types(string|null $language = null, array $fields = [], string|null $battleType = null): ApiResult
     {
         return $this->client->request(
+            'ratings/types',
+            [
+                'language' => $language,
+                'fields' => $fields,
+                'battle_type' => $battleType,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * ratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     */
+    public function prepareTypes(
+        string|null $language = null,
+        array $fields = [],
+        string|null $battleType = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'ratings/types',
             [
                 'language' => $language,
@@ -58,6 +80,32 @@ final readonly class Ratings extends Service
     }
 
     /**
+     * ratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     * @param list<int> $accountIds
+     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     */
+    public function prepareDates(
+        string $type,
+        string|null $language = null,
+        array $fields = [],
+        string|null $battleType = null,
+        array $accountIds = [],
+    ): PreparedOperation {
+        return $this->client->prepare(
+            'ratings/dates',
+            [
+                'type' => $type,
+                'language' => $language,
+                'fields' => $fields,
+                'battle_type' => $battleType,
+                'account_id' => $accountIds,
+            ],
+            null,
+        );
+    }
+
+    /**
      * ratings/accounts; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<int> $accountIds
      * @param list<string> $fields
@@ -72,6 +120,34 @@ final readonly class Ratings extends Service
         int|string|null $date = null,
     ): ApiResult {
         return $this->client->request(
+            'ratings/accounts',
+            [
+                'type' => $type,
+                'account_id' => $accountIds,
+                'language' => $language,
+                'fields' => $fields,
+                'battle_type' => $battleType,
+                'date' => $date,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * ratings/accounts; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $accountIds
+     * @param list<string> $fields
+     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     */
+    public function prepareAccounts(
+        string $type,
+        array $accountIds,
+        string|null $language = null,
+        array $fields = [],
+        string|null $battleType = null,
+        int|string|null $date = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'ratings/accounts',
             [
                 'type' => $type,
@@ -117,6 +193,37 @@ final readonly class Ratings extends Service
     }
 
     /**
+     * ratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     */
+    public function prepareNeighbors(
+        string $type,
+        int $accountId,
+        string $rankField,
+        string|null $language = null,
+        array $fields = [],
+        string|null $battleType = null,
+        int|string|null $date = null,
+        int|null $limit = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
+            'ratings/neighbors',
+            [
+                'type' => $type,
+                'account_id' => $accountId,
+                'rank_field' => $rankField,
+                'language' => $language,
+                'fields' => $fields,
+                'battle_type' => $battleType,
+                'date' => $date,
+                'limit' => $limit,
+            ],
+            null,
+        );
+    }
+
+    /**
      * ratings/top; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<string> $fields
      * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
@@ -132,6 +239,37 @@ final readonly class Ratings extends Service
         int|null $pageNo = null,
     ): ApiResult {
         return $this->client->request(
+            'ratings/top',
+            [
+                'type' => $type,
+                'rank_field' => $rankField,
+                'language' => $language,
+                'fields' => $fields,
+                'battle_type' => $battleType,
+                'date' => $date,
+                'limit' => $limit,
+                'page_no' => $pageNo,
+            ],
+            null,
+        );
+    }
+
+    /**
+     * ratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     */
+    public function prepareTop(
+        string $type,
+        string $rankField,
+        string|null $language = null,
+        array $fields = [],
+        string|null $battleType = null,
+        int|string|null $date = null,
+        int|null $limit = null,
+        int|null $pageNo = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'ratings/top',
             [
                 'type' => $type,

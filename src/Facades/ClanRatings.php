@@ -6,6 +6,7 @@ namespace edrard\WotClient\Facades;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -22,11 +23,27 @@ final class ClanRatings
     }
 
     /**
+     * clanratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     */
+    public static function prepareTypes(): PreparedOperation
+    {
+        return Wot::client()->clanRatings()->prepareTypes();
+    }
+
+    /**
      * clanratings/dates; see the official reference linked in docs/ENDPOINTS.md.
      */
     public static function dates(int|null $limit = null): ApiResult
     {
         return Wot::client()->clanRatings()->dates($limit);
+    }
+
+    /**
+     * clanratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     */
+    public static function prepareDates(int|null $limit = null): PreparedOperation
+    {
+        return Wot::client()->clanRatings()->prepareDates($limit);
     }
 
     /**
@@ -41,6 +58,20 @@ final class ClanRatings
         int|string|null $date = null,
     ): ApiResult {
         return Wot::client()->clanRatings()->clans($clanIds, $language, $fields, $date);
+    }
+
+    /**
+     * clanratings/clans; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $clanIds
+     * @param list<string> $fields
+     */
+    public static function prepareClans(
+        array $clanIds,
+        string|null $language = null,
+        array $fields = [],
+        int|string|null $date = null,
+    ): PreparedOperation {
+        return Wot::client()->clanRatings()->prepareClans($clanIds, $language, $fields, $date);
     }
 
     /**
@@ -59,6 +90,28 @@ final class ClanRatings
     }
 
     /**
+     * clanratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public static function prepareNeighbors(
+        string $rankField,
+        int $clanId,
+        string|null $language = null,
+        array $fields = [],
+        int|string|null $date = null,
+        int|null $limit = null,
+    ): PreparedOperation {
+        return Wot::client()->clanRatings()->prepareNeighbors(
+            $rankField,
+            $clanId,
+            $language,
+            $fields,
+            $date,
+            $limit,
+        );
+    }
+
+    /**
      * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<string> $fields
      */
@@ -71,6 +124,21 @@ final class ClanRatings
         int|null $limit = null,
     ): ApiResult {
         return Wot::client()->clanRatings()->top($rankField, $language, $fields, $date, $pageNo, $limit);
+    }
+
+    /**
+     * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public static function prepareTop(
+        string $rankField,
+        string|null $language = null,
+        array $fields = [],
+        int|string|null $date = null,
+        int|null $pageNo = null,
+        int|null $limit = null,
+    ): PreparedOperation {
+        return Wot::client()->clanRatings()->prepareTop($rankField, $language, $fields, $date, $pageNo, $limit);
     }
 
     /**

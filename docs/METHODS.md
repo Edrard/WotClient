@@ -72,6 +72,8 @@ Accounts::search(
 
 Top-level response fields: `account_id` (numeric), `nickname` (string).
 
+Multiget: `prepareSearch()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:account/list -->
 ```php
 // Instance call
@@ -87,6 +89,16 @@ $result = Accounts::search(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->accounts()->prepareSearch(
+    search: 'Player',
+    limit: 10,
+);
+$operation = Accounts::prepareSearch(
+    search: 'Player',
+    limit: 10,
+);
 ```
 
 ### account/info
@@ -119,6 +131,8 @@ Accounts::info(
 
 Top-level response fields: `account_id` (numeric), `clan_id` (numeric), `client_language` (string), `created_at` (timestamp), `global_rating` (numeric), `last_battle_time` (timestamp), `logout_at` (timestamp), `nickname` (string), `private` (block_header), `statistics` (block_header), `updated_at` (timestamp).
 
+Multiget: `prepareInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:account/info -->
 ```php
 // Instance call
@@ -132,6 +146,14 @@ $result = Accounts::info(
     accountIds: [$accountId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->accounts()->prepareInfo(
+    accountIds: [$accountId],
+);
+$operation = Accounts::prepareInfo(
+    accountIds: [$accountId],
+);
 ```
 
 ### account/tanks
@@ -164,6 +186,8 @@ Accounts::tanks(
 
 Top-level response fields: `mark_of_mastery` (numeric), `statistics` (block_header), `tank_id` (numeric).
 
+Multiget: `prepareTanks()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:account/tanks -->
 ```php
 // Instance call
@@ -177,6 +201,14 @@ $result = Accounts::tanks(
     accountIds: [$accountId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->accounts()->prepareTanks(
+    accountIds: [$accountId],
+);
+$operation = Accounts::prepareTanks(
+    accountIds: [$accountId],
+);
 ```
 
 ### account/achievements
@@ -205,6 +237,8 @@ Accounts::achievements(
 
 Top-level response fields: `achievements` (associative array), `frags` (associative array), `max_series` (associative array).
 
+Multiget: `prepareAchievements()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:account/achievements -->
 ```php
 // Instance call
@@ -218,6 +252,14 @@ $result = Accounts::achievements(
     accountIds: [$accountId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->accounts()->prepareAchievements(
+    accountIds: [$accountId],
+);
+$operation = Accounts::prepareAchievements(
+    accountIds: [$accountId],
+);
 ```
 
 ### account/wtr
@@ -246,6 +288,8 @@ Accounts::wtr(
 
 Top-level response fields: `account_id` (numeric), `rating` (numeric).
 
+Multiget: `prepareWtr()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:account/wtr -->
 ```php
 // Instance call
@@ -259,6 +303,14 @@ $result = Accounts::wtr(
     accountIds: [$accountId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->accounts()->prepareWtr(
+    accountIds: [$accountId],
+);
+$operation = Accounts::prepareWtr(
+    accountIds: [$accountId],
+);
 ```
 
 ## tanks
@@ -297,6 +349,8 @@ Tanks::stats(
 
 Top-level response fields: `account_id` (numeric), `all` (block_header), `clan` (block_header), `company` (block_header), `epic` (block_header), `fallout` (block_header), `frags` (associative array), `globalmap` (block_header), `in_garage` (boolean), `mark_of_mastery` (numeric), `max_frags` (numeric), `max_xp` (numeric), `random` (block_header), `ranked_10x10` (block_header), `ranked_battles` (block_header), `regular_team` (block_header), `stronghold_defense` (block_header), `stronghold_skirmish` (block_header), `tank_id` (numeric), `team` (block_header).
 
+Multiget: `prepareStats()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:tanks/stats -->
 ```php
 // Instance call
@@ -310,6 +364,14 @@ $result = Tanks::stats(
     accountId: $accountId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->tanks()->prepareStats(
+    accountId: $accountId,
+);
+$operation = Tanks::prepareStats(
+    accountId: $accountId,
+);
 ```
 
 ### tanks/achievements
@@ -344,6 +406,8 @@ Tanks::achievements(
 
 Top-level response fields: `account_id` (numeric), `achievements` (associative array), `max_series` (associative array), `series` (associative array), `tank_id` (numeric).
 
+Multiget: `prepareAchievements()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:tanks/achievements -->
 ```php
 // Instance call
@@ -357,6 +421,14 @@ $result = Tanks::achievements(
     accountId: $accountId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->tanks()->prepareAchievements(
+    accountId: $accountId,
+);
+$operation = Tanks::prepareAchievements(
+    accountId: $accountId,
+);
 ```
 
 ### tanks/mastery
@@ -389,6 +461,8 @@ Tanks::mastery(
 
 Top-level response fields: `distribution` (associative array), `updated_at` (timestamp).
 
+Multiget: `prepareMastery()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:tanks/mastery -->
 ```php
 // Instance call
@@ -404,6 +478,16 @@ $result = Tanks::mastery(
     percentile: [50, 90],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->tanks()->prepareMastery(
+    distribution: 'xp',
+    percentile: [50, 90],
+);
+$operation = Tanks::prepareMastery(
+    distribution: 'xp',
+    percentile: [50, 90],
+);
 ```
 
 ## encyclopedia
@@ -434,6 +518,8 @@ Encyclopedia::tanks(
 
 Top-level response fields: `contour_image` (string), `image` (string), `image_small` (string), `is_premium` (boolean), `level` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `short_name_i18n` (string), `tank_id` (numeric), `type` (string), `type_i18n` (string).
 
+Multiget: `prepareTanks()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tanks -->
 ```php
 // Instance call
@@ -443,6 +529,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::tanks();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTanks();
+$operation = Encyclopedia::prepareTanks();
 ```
 
 ### encyclopedia/tankinfo
@@ -473,6 +563,8 @@ Encyclopedia::tankInfo(
 
 Top-level response fields: `chassis` (block_header), `chassis_rotation_speed` (numeric), `circular_vision_radius` (numeric), `contour_image` (string), `crew` (block_header), `engine_power` (numeric), `engines` (block_header), `gun_damage_max` (numeric), `gun_damage_min` (numeric), `gun_max_ammo` (numeric), `gun_name` (string), `gun_piercing_power_max` (numeric), `gun_piercing_power_min` (numeric), `gun_rate` (float), `guns` (block_header), `image` (string), `image_small` (string), `is_gift` (boolean), `is_premium` (boolean), `level` (numeric), `limit_weight` (float), `localized_name` (string), `max_health` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `parent_tanks` (list of integers), `price_credit` (numeric), `price_gold` (numeric), `price_xp` (numeric), `radio_distance` (numeric), `radios` (block_header), `short_name_i18n` (string), `speed_limit` (float), `tank_id` (numeric), `turret_armor_board` (numeric), `turret_armor_fedd` (numeric), `turret_armor_forehead` (numeric), `turret_rotation_speed` (numeric), `turrets` (block_header), `type` (string), `type_i18n` (string), `vehicle_armor_board` (numeric), `vehicle_armor_fedd` (numeric), `vehicle_armor_forehead` (numeric), `weight` (float).
 
+Multiget: `prepareTankInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tankinfo -->
 ```php
 // Instance call
@@ -486,6 +578,14 @@ $result = Encyclopedia::tankInfo(
     tankIds: [$tankId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTankInfo(
+    tankIds: [$tankId],
+);
+$operation = Encyclopedia::prepareTankInfo(
+    tankIds: [$tankId],
+);
 ```
 
 ### encyclopedia/vehicles
@@ -524,6 +624,8 @@ Encyclopedia::vehicles(
 
 Top-level response fields: `crew` (block_header), `default_profile` (block_header), `description` (string), `engines` (list of integers), `guns` (list of integers), `images` (block_header), `is_gift` (boolean), `is_premium` (boolean), `is_premium_igr` (boolean), `is_wheeled` (boolean), `modules_tree` (block_header), `multination` (block_header), `name` (string), `nation` (string), `next_tanks` (associative array), `price_credit` (numeric), `price_gold` (numeric), `prices_xp` (associative array), `provisions` (list of integers), `radios` (list of integers), `short_name` (string), `suspensions` (list of integers), `tag` (string), `tank_id` (numeric), `tier` (numeric), `turrets` (list of integers), `type` (string).
 
+Multiget: `prepareVehicles()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateVehicles()` returns Generator of Record/null; `allVehicles()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:encyclopedia/vehicles -->
@@ -539,6 +641,14 @@ $result = Encyclopedia::vehicles(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareVehicles(
+    limit: 10,
+);
+$operation = Encyclopedia::prepareVehicles(
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->encyclopedia()->iterateVehicles(
@@ -605,6 +715,8 @@ Encyclopedia::vehicleProfile(
 
 Top-level response fields: `ammo` (block_header), `armor` (block_header), `engine` (block_header), `gun` (block_header), `hp` (numeric), `hull_hp` (numeric), `hull_weight` (numeric), `is_default` (boolean), `max_ammo` (numeric), `max_weight` (numeric), `modules` (block_header), `profile_id` (string), `radio` (block_header), `rapid` (block_header), `siege` (block_header), `speed_backward` (numeric), `speed_forward` (numeric), `suspension` (block_header), `tank_id` (numeric), `turret` (block_header), `weight` (numeric).
 
+Multiget: `prepareVehicleProfile()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/vehicleprofile -->
 ```php
 // Instance call
@@ -618,6 +730,14 @@ $result = Encyclopedia::vehicleProfile(
     tankId: $tankId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareVehicleProfile(
+    tankId: $tankId,
+);
+$operation = Encyclopedia::prepareVehicleProfile(
+    tankId: $tankId,
+);
 ```
 
 ### encyclopedia/tankengines
@@ -650,6 +770,8 @@ Encyclopedia::tankEngines(
 
 Top-level response fields: `fire_starting_chance` (numeric), `level` (numeric), `module_id` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `power` (numeric), `price_credit` (numeric), `price_gold` (numeric), `tanks` (list of integers).
 
+Multiget: `prepareTankEngines()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tankengines -->
 ```php
 // Instance call
@@ -659,6 +781,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::tankEngines();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTankEngines();
+$operation = Encyclopedia::prepareTankEngines();
 ```
 
 ### encyclopedia/tankturrets
@@ -691,6 +817,8 @@ Encyclopedia::tankTurrets(
 
 Top-level response fields: `armor_board` (numeric), `armor_fedd` (numeric), `armor_forehead` (numeric), `circular_vision_radius` (numeric), `level` (numeric), `module_id` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `price_credit` (numeric), `price_gold` (numeric), `rotation_speed` (numeric), `tanks` (list of integers).
 
+Multiget: `prepareTankTurrets()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tankturrets -->
 ```php
 // Instance call
@@ -700,6 +828,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::tankTurrets();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTankTurrets();
+$operation = Encyclopedia::prepareTankTurrets();
 ```
 
 ### encyclopedia/tankradios
@@ -732,6 +864,8 @@ Encyclopedia::tankRadios(
 
 Top-level response fields: `distance` (numeric), `level` (numeric), `module_id` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `price_credit` (numeric), `price_gold` (numeric), `tanks` (list of integers).
 
+Multiget: `prepareTankRadios()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tankradios -->
 ```php
 // Instance call
@@ -741,6 +875,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::tankRadios();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTankRadios();
+$operation = Encyclopedia::prepareTankRadios();
 ```
 
 ### encyclopedia/tankchassis
@@ -773,6 +911,8 @@ Encyclopedia::tankChassis(
 
 Top-level response fields: `level` (numeric), `max_load` (float), `module_id` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `price_credit` (numeric), `price_gold` (numeric), `rotation_speed` (numeric), `tanks` (list of integers).
 
+Multiget: `prepareTankChassis()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tankchassis -->
 ```php
 // Instance call
@@ -782,6 +922,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::tankChassis();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTankChassis();
+$operation = Encyclopedia::prepareTankChassis();
 ```
 
 ### encyclopedia/tankguns
@@ -818,6 +962,8 @@ Encyclopedia::tankGuns(
 
 Top-level response fields: `damage` (list of integers), `level` (numeric), `module_id` (numeric), `name` (string), `name_i18n` (string), `nation` (string), `nation_i18n` (string), `piercing_power` (list of integers), `price_credit` (numeric), `price_gold` (numeric), `rate` (float), `tanks` (list of integers), `turrets` (list of integers).
 
+Multiget: `prepareTankGuns()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/tankguns -->
 ```php
 // Instance call
@@ -827,6 +973,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::tankGuns();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->encyclopedia()->prepareTankGuns();
+$operation = Encyclopedia::prepareTankGuns();
 ```
 
 ### encyclopedia/achievements
@@ -853,6 +1003,8 @@ Encyclopedia::achievements(
 
 Top-level response fields: `condition` (string), `description` (string), `hero_info` (string), `image` (string), `image_big` (string), `name` (string), `name_i18n` (string), `options` (block_header), `order` (numeric), `outdated` (boolean), `section` (string), `section_order` (numeric), `type` (string).
 
+Multiget: `prepareAchievements()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/achievements -->
 ```php
 // Instance call
@@ -862,6 +1014,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::achievements();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareAchievements();
+$operation = Encyclopedia::prepareAchievements();
 ```
 
 ### encyclopedia/info
@@ -888,6 +1044,8 @@ Encyclopedia::info(
 
 Top-level response fields: `achievement_sections` (block_header), `game_version` (string), `languages` (associative array), `tanks_updated_at` (timestamp), `vehicle_crew_roles` (associative array), `vehicle_nations` (associative array), `vehicle_types` (associative array).
 
+Multiget: `prepareInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/info -->
 ```php
 // Instance call
@@ -897,6 +1055,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::info();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareInfo();
+$operation = Encyclopedia::prepareInfo();
 ```
 
 ### encyclopedia/arenas
@@ -923,6 +1085,8 @@ Encyclopedia::arenas(
 
 Top-level response fields: `arena_id` (string), `camouflage_type` (string), `description` (string), `name_i18n` (string).
 
+Multiget: `prepareArenas()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/arenas -->
 ```php
 // Instance call
@@ -932,6 +1096,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::arenas();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareArenas();
+$operation = Encyclopedia::prepareArenas();
 ```
 
 ### encyclopedia/provisions
@@ -966,6 +1134,8 @@ Encyclopedia::provisions(
 
 Top-level response fields: `description` (string), `image` (string), `name` (string), `price_credit` (numeric), `price_gold` (numeric), `provision_id` (numeric), `tag` (string), `type` (string), `weight` (numeric).
 
+Multiget: `prepareProvisions()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateProvisions()` returns Generator of Record/null; `allProvisions()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:encyclopedia/provisions -->
@@ -981,6 +1151,14 @@ $result = Encyclopedia::provisions(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareProvisions(
+    limit: 10,
+);
+$operation = Encyclopedia::prepareProvisions(
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->encyclopedia()->iterateProvisions(
@@ -1041,6 +1219,8 @@ Encyclopedia::personalMissions(
 
 Top-level response fields: `campaign_id` (numeric), `description` (string), `name` (string), `operations` (block_header).
 
+Multiget: `preparePersonalMissions()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/personalmissions -->
 ```php
 // Instance call
@@ -1050,6 +1230,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::personalMissions();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->preparePersonalMissions();
+$operation = Encyclopedia::preparePersonalMissions();
 ```
 
 ### encyclopedia/boosters
@@ -1076,6 +1260,8 @@ Encyclopedia::boosters(
 
 Top-level response fields: `booster_id` (numeric), `description` (string), `expires_at` (timestamp), `images` (block_header), `is_auto` (boolean), `lifetime` (numeric), `name` (string), `price_credit` (numeric), `price_gold` (numeric), `resource` (string).
 
+Multiget: `prepareBoosters()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/boosters -->
 ```php
 // Instance call
@@ -1085,6 +1271,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::boosters();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareBoosters();
+$operation = Encyclopedia::prepareBoosters();
 ```
 
 ### encyclopedia/vehicleprofiles
@@ -1115,6 +1305,8 @@ Encyclopedia::vehicleProfiles(
 
 Top-level response fields: `is_default` (boolean), `price_credit` (numeric), `profile_id` (string), `tank_id` (numeric).
 
+Multiget: `prepareVehicleProfiles()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/vehicleprofiles -->
 ```php
 // Instance call
@@ -1128,6 +1320,14 @@ $result = Encyclopedia::vehicleProfiles(
     tankId: $tankId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareVehicleProfiles(
+    tankId: $tankId,
+);
+$operation = Encyclopedia::prepareVehicleProfiles(
+    tankId: $tankId,
+);
 ```
 
 ### encyclopedia/modules
@@ -1166,6 +1366,8 @@ Encyclopedia::modules(
 
 Top-level response fields: `default_profile` (block_header), `image` (string), `module_id` (numeric), `name` (string), `nation` (string), `price_credit` (numeric), `tanks` (list of integers), `tier` (numeric), `type` (string), `weight` (numeric).
 
+Multiget: `prepareModules()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateModules()` returns Generator of Record/null; `allModules()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:encyclopedia/modules -->
@@ -1181,6 +1383,14 @@ $result = Encyclopedia::modules(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareModules(
+    limit: 10,
+);
+$operation = Encyclopedia::prepareModules(
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->encyclopedia()->iterateModules(
@@ -1233,6 +1443,8 @@ Encyclopedia::badges(
 
 Top-level response fields: `badge_id` (numeric), `description` (string), `images` (block_header), `name` (string).
 
+Multiget: `prepareBadges()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/badges -->
 ```php
 // Instance call
@@ -1242,6 +1454,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::badges();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareBadges();
+$operation = Encyclopedia::prepareBadges();
 ```
 
 ### encyclopedia/crewroles
@@ -1270,6 +1486,8 @@ Encyclopedia::crewRoles(
 
 Top-level response fields: `name` (string), `role` (string), `skills` (list of strings).
 
+Multiget: `prepareCrewRoles()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/crewroles -->
 ```php
 // Instance call
@@ -1279,6 +1497,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::crewRoles();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareCrewRoles();
+$operation = Encyclopedia::prepareCrewRoles();
 ```
 
 ### encyclopedia/crewskills
@@ -1309,6 +1531,8 @@ Encyclopedia::crewSkills(
 
 Top-level response fields: `description` (string), `image_url` (block_header), `is_perk` (boolean), `name` (string), `skill` (string).
 
+Multiget: `prepareCrewSkills()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:encyclopedia/crewskills -->
 ```php
 // Instance call
@@ -1318,6 +1542,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::crewSkills();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->encyclopedia()->prepareCrewSkills();
+$operation = Encyclopedia::prepareCrewSkills();
 ```
 
 ## clans
@@ -1352,6 +1580,8 @@ Clans::search(
 
 Top-level response fields: `clan_id` (numeric), `color` (string), `created_at` (timestamp), `emblems` (block_header), `members_count` (numeric), `name` (string), `tag` (string).
 
+Multiget: `prepareSearch()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateSearch()` returns Generator of Record/null; `allSearch()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:clans/list -->
@@ -1369,6 +1599,16 @@ $result = Clans::search(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clans()->prepareSearch(
+    search: 'WOT',
+    limit: 10,
+);
+$operation = Clans::prepareSearch(
+    search: 'WOT',
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->clans()->iterateSearch(
@@ -1433,6 +1673,8 @@ Clans::info(
 
 Top-level response fields: `accepts_join_requests` (boolean), `clan_id` (numeric), `color` (string), `created_at` (timestamp), `creator_id` (numeric), `creator_name` (string), `description` (string), `description_html` (string), `emblems` (block_header), `is_clan_disbanded` (boolean), `leader_id` (numeric), `leader_name` (string), `members` (block_header), `members_count` (numeric), `motto` (string), `name` (string), `old_name` (string), `old_tag` (string), `private` (block_header), `renamed_at` (timestamp), `tag` (string), `updated_at` (timestamp).
 
+Multiget: `prepareInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clans/info -->
 ```php
 // Instance call
@@ -1446,6 +1688,14 @@ $result = Clans::info(
     clanIds: [$clanId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clans()->prepareInfo(
+    clanIds: [$clanId],
+);
+$operation = Clans::prepareInfo(
+    clanIds: [$clanId],
+);
 ```
 
 ### clans/accountinfo
@@ -1474,6 +1724,8 @@ Clans::accountInfo(
 
 Top-level response fields: `account_id` (numeric), `account_name` (string), `clan` (block_header), `joined_at` (timestamp), `role` (string), `role_i18n` (string).
 
+Multiget: `prepareAccountInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clans/accountinfo -->
 ```php
 // Instance call
@@ -1487,6 +1739,14 @@ $result = Clans::accountInfo(
     accountIds: [$accountId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clans()->prepareAccountInfo(
+    accountIds: [$accountId],
+);
+$operation = Clans::prepareAccountInfo(
+    accountIds: [$accountId],
+);
 ```
 
 ### clans/glossary
@@ -1513,6 +1773,8 @@ Clans::glossary(
 
 Top-level response fields: `clans_roles` (associative array).
 
+Multiget: `prepareGlossary()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clans/glossary -->
 ```php
 // Instance call
@@ -1522,6 +1784,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Clans::glossary();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clans()->prepareGlossary();
+$operation = Clans::prepareGlossary();
 ```
 
 ### clans/messageboard
@@ -1548,6 +1814,8 @@ Clans::messageboard(
 
 Top-level response fields: `author_id` (numeric), `created_at` (timestamp), `editor_id` (numeric), `is_read` (boolean), `message` (string), `updated_at` (timestamp).
 
+Multiget: `prepareMessageboard()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clans/messageboard -->
 ```php
 // Instance call
@@ -1561,6 +1829,14 @@ $result = Clans::messageboard(
     accessToken: $token,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clans()->prepareMessageboard(
+    accessToken: $token,
+);
+$operation = Clans::prepareMessageboard(
+    accessToken: $token,
+);
 ```
 
 ### clans/memberhistory
@@ -1589,6 +1865,8 @@ Clans::memberHistory(
 
 Top-level response fields: `account_id` (numeric), `clan_id` (numeric), `joined_at` (timestamp), `left_at` (timestamp), `role` (string).
 
+Multiget: `prepareMemberHistory()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clans/memberhistory -->
 ```php
 // Instance call
@@ -1602,6 +1880,14 @@ $result = Clans::memberHistory(
     accountId: $accountId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clans()->prepareMemberHistory(
+    accountId: $accountId,
+);
+$operation = Clans::prepareMemberHistory(
+    accountId: $accountId,
+);
 ```
 
 ## clanRatings
@@ -1627,6 +1913,8 @@ ClanRatings::types(
 
 Top-level response fields: `rank_fields` (list of strings), `type` (string).
 
+Multiget: `prepareTypes()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clanratings/types -->
 ```php
 // Instance call
@@ -1636,6 +1924,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = ClanRatings::types();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clanRatings()->prepareTypes();
+$operation = ClanRatings::prepareTypes();
 ```
 
 ### clanratings/dates
@@ -1660,6 +1952,8 @@ ClanRatings::dates(
 
 Top-level response fields: `dates` (list of timestamps).
 
+Multiget: `prepareDates()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clanratings/dates -->
 ```php
 // Instance call
@@ -1673,6 +1967,14 @@ $result = ClanRatings::dates(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clanRatings()->prepareDates(
+    limit: 10,
+);
+$operation = ClanRatings::prepareDates(
+    limit: 10,
+);
 ```
 
 ### clanratings/clans
@@ -1703,6 +2005,8 @@ ClanRatings::clans(
 
 Top-level response fields: `battles_count_avg` (block_header), `battles_count_avg_daily` (block_header), `clan_id` (numeric), `clan_name` (string), `clan_tag` (string), `efficiency` (block_header), `exclude_reasons` (associative array), `fb_elo_rating` (block_header), `fb_elo_rating_10` (block_header), `fb_elo_rating_6` (block_header), `fb_elo_rating_8` (block_header), `global_rating_avg` (block_header), `global_rating_weighted_avg` (block_header), `gm_elo_rating` (block_header), `gm_elo_rating_10` (block_header), `gm_elo_rating_6` (block_header), `gm_elo_rating_8` (block_header), `rating_fort` (block_header), `v10l_avg` (block_header), `wins_ratio_avg` (block_header).
 
+Multiget: `prepareClans()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clanratings/clans -->
 ```php
 // Instance call
@@ -1716,6 +2020,14 @@ $result = ClanRatings::clans(
     clanIds: [$clanId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clanRatings()->prepareClans(
+    clanIds: [$clanId],
+);
+$operation = ClanRatings::prepareClans(
+    clanIds: [$clanId],
+);
 ```
 
 ### clanratings/neighbors
@@ -1750,6 +2062,8 @@ ClanRatings::neighbors(
 
 Top-level response fields: `battles_count_avg` (block_header), `battles_count_avg_daily` (block_header), `clan_id` (numeric), `clan_name` (string), `clan_tag` (string), `efficiency` (block_header), `exclude_reasons` (associative array), `fb_elo_rating` (block_header), `fb_elo_rating_10` (block_header), `fb_elo_rating_6` (block_header), `fb_elo_rating_8` (block_header), `global_rating_avg` (block_header), `global_rating_weighted_avg` (block_header), `gm_elo_rating` (block_header), `gm_elo_rating_10` (block_header), `gm_elo_rating_6` (block_header), `gm_elo_rating_8` (block_header), `rating_fort` (block_header), `v10l_avg` (block_header), `wins_ratio_avg` (block_header).
 
+Multiget: `prepareNeighbors()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:clanratings/neighbors -->
 ```php
 // Instance call
@@ -1767,6 +2081,18 @@ $result = ClanRatings::neighbors(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clanRatings()->prepareNeighbors(
+    rankField: $rankField,
+    clanId: $clanId,
+    limit: 10,
+);
+$operation = ClanRatings::prepareNeighbors(
+    rankField: $rankField,
+    clanId: $clanId,
+    limit: 10,
+);
 ```
 
 ### clanratings/top
@@ -1801,6 +2127,8 @@ ClanRatings::top(
 
 Top-level response fields: `battles_count_avg` (block_header), `battles_count_avg_daily` (block_header), `clan_id` (numeric), `clan_name` (string), `clan_tag` (string), `efficiency` (block_header), `exclude_reasons` (associative array), `fb_elo_rating` (block_header), `fb_elo_rating_10` (block_header), `fb_elo_rating_6` (block_header), `fb_elo_rating_8` (block_header), `global_rating_avg` (block_header), `global_rating_weighted_avg` (block_header), `gm_elo_rating` (block_header), `gm_elo_rating_10` (block_header), `gm_elo_rating_6` (block_header), `gm_elo_rating_8` (block_header), `rating_fort` (block_header), `v10l_avg` (block_header), `wins_ratio_avg` (block_header).
 
+Multiget: `prepareTop()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateTop()` returns Generator of Record/null; `allTop()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:clanratings/top -->
@@ -1818,6 +2146,16 @@ $result = ClanRatings::top(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->clanRatings()->prepareTop(
+    rankField: $rankField,
+    limit: 10,
+);
+$operation = ClanRatings::prepareTop(
+    rankField: $rankField,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->clanRatings()->iterateTop(
@@ -1882,6 +2220,8 @@ GlobalMap::fronts(
 
 Top-level response fields: `available_extensions` (block_header), `avg_clans_rating` (numeric), `avg_min_bet` (numeric), `avg_won_bet` (numeric), `battle_time_limit` (numeric), `division_cost` (numeric), `fog_of_war` (boolean), `front_id` (string), `front_name` (string), `is_active` (boolean), `is_event` (boolean), `max_tanks_per_division` (numeric), `max_vehicle_level` (numeric), `min_tanks_per_division` (numeric), `min_vehicle_level` (numeric), `provinces_count` (numeric), `vehicle_freeze` (boolean).
 
+Multiget: `prepareFronts()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateFronts()` returns Generator of Record/null; `allFronts()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/fronts -->
@@ -1897,6 +2237,14 @@ $result = GlobalMap::fronts(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareFronts(
+    limit: 10,
+);
+$operation = GlobalMap::prepareFronts(
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateFronts(
@@ -1969,6 +2317,8 @@ GlobalMap::provinces(
 
 Top-level response fields: `active_battles` (block_header), `arena_id` (string), `arena_name` (string), `attackers` (list of integers), `battles_start_at` (string), `competitors` (list of integers), `current_min_bet` (numeric), `daily_revenue` (numeric), `front_id` (string), `front_name` (string), `is_borders_disabled` (boolean), `landing_type` (string), `last_won_bet` (numeric), `max_bets` (numeric), `neighbours` (list of strings), `owner_clan_id` (numeric), `pillage_end_at` (string), `prime_time` (string), `province_id` (string), `province_name` (string), `revenue_level` (numeric), `round_number` (numeric), `server` (string), `status` (string), `uri` (string), `world_redivision` (boolean).
 
+Multiget: `prepareProvinces()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateProvinces()` returns Generator of Record/null; `allProvinces()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/provinces -->
@@ -1986,6 +2336,16 @@ $result = GlobalMap::provinces(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareProvinces(
+    frontId: $frontId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareProvinces(
+    frontId: $frontId,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateProvinces(
@@ -2044,6 +2404,8 @@ GlobalMap::clanInfo(
 
 Top-level response fields: `clan_id` (numeric), `name` (string), `private` (block_header), `ratings` (block_header), `statistics` (block_header), `tag` (string).
 
+Multiget: `prepareClanInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/claninfo -->
 ```php
 // Instance call
@@ -2057,6 +2419,14 @@ $result = GlobalMap::clanInfo(
     clanIds: [$clanId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareClanInfo(
+    clanIds: [$clanId],
+);
+$operation = GlobalMap::prepareClanInfo(
+    clanIds: [$clanId],
+);
 ```
 
 ### globalmap/clanprovinces
@@ -2087,6 +2457,8 @@ GlobalMap::clanProvinces(
 
 Top-level response fields: `arena_id` (string), `arena_name` (string), `clan_id` (numeric), `daily_revenue` (numeric), `front_id` (string), `front_name` (string), `landing_type` (string), `max_vehicle_level` (numeric), `pillage_end_at` (string), `prime_time` (string), `private` (block_header), `province_id` (string), `province_name` (string), `revenue_level` (numeric), `turns_owned` (numeric).
 
+Multiget: `prepareClanProvinces()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/clanprovinces -->
 ```php
 // Instance call
@@ -2100,6 +2472,14 @@ $result = GlobalMap::clanProvinces(
     clanIds: [$clanId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareClanProvinces(
+    clanIds: [$clanId],
+);
+$operation = GlobalMap::prepareClanProvinces(
+    clanIds: [$clanId],
+);
 ```
 
 ### globalmap/clanbattles
@@ -2132,6 +2512,8 @@ GlobalMap::clanBattles(
 
 Top-level response fields: `attack_type` (string), `competitor_id` (numeric), `front_id` (string), `front_name` (string), `province_id` (string), `province_name` (string), `time` (timestamp), `type` (string), `vehicle_level` (numeric).
 
+Multiget: `prepareClanBattles()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateClanBattles()` returns Generator of Record/null; `allClanBattles()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/clanbattles -->
@@ -2149,6 +2531,16 @@ $result = GlobalMap::clanBattles(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareClanBattles(
+    clanId: $clanId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareClanBattles(
+    clanId: $clanId,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateClanBattles(
@@ -2213,6 +2605,8 @@ GlobalMap::seasons(
 
 Top-level response fields: `end` (string), `fronts` (block_header), `season_id` (string), `season_name` (string), `start` (string), `status` (string).
 
+Multiget: `prepareSeasons()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateSeasons()` returns Generator of Record/null; `allSeasons()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/seasons -->
@@ -2228,6 +2622,14 @@ $result = GlobalMap::seasons(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareSeasons(
+    limit: 10,
+);
+$operation = GlobalMap::prepareSeasons(
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateSeasons(
@@ -2284,6 +2686,8 @@ GlobalMap::seasonClanInfo(
 
 Top-level response fields: `seasons` (block_header).
 
+Multiget: `prepareSeasonClanInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/seasonclaninfo -->
 ```php
 // Instance call
@@ -2301,6 +2705,18 @@ $result = GlobalMap::seasonClanInfo(
     clanId: $clanId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareSeasonClanInfo(
+    seasonId: $seasonId,
+    vehicleLevel: ['10'],
+    clanId: $clanId,
+);
+$operation = GlobalMap::prepareSeasonClanInfo(
+    seasonId: $seasonId,
+    vehicleLevel: ['10'],
+    clanId: $clanId,
+);
 ```
 
 ### globalmap/seasonaccountinfo
@@ -2331,6 +2747,8 @@ GlobalMap::seasonAccountInfo(
 
 Top-level response fields: `seasons` (block_header).
 
+Multiget: `prepareSeasonAccountInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/seasonaccountinfo -->
 ```php
 // Instance call
@@ -2348,6 +2766,18 @@ $result = GlobalMap::seasonAccountInfo(
     accountId: $accountId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareSeasonAccountInfo(
+    seasonId: $seasonId,
+    vehicleLevel: ['10'],
+    accountId: $accountId,
+);
+$operation = GlobalMap::prepareSeasonAccountInfo(
+    seasonId: $seasonId,
+    vehicleLevel: ['10'],
+    accountId: $accountId,
+);
 ```
 
 ### globalmap/seasonrating
@@ -2380,6 +2810,8 @@ GlobalMap::seasonRating(
 
 Top-level response fields: `award_level` (string), `clan_id` (numeric), `color` (string), `name` (string), `rank` (numeric), `rank_delta` (numeric), `tag` (string), `updated_at` (timestamp), `victory_points` (numeric), `victory_points_to_next_award` (numeric).
 
+Multiget: `prepareSeasonRating()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateSeasonRating()` returns Generator of Record/null; `allSeasonRating()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/seasonrating -->
@@ -2399,6 +2831,18 @@ $result = GlobalMap::seasonRating(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareSeasonRating(
+    seasonId: $seasonId,
+    vehicleLevel: '10',
+    limit: 10,
+);
+$operation = GlobalMap::prepareSeasonRating(
+    seasonId: $seasonId,
+    vehicleLevel: '10',
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateSeasonRating(
@@ -2465,6 +2909,8 @@ GlobalMap::seasonRatingNeighbors(
 
 Top-level response fields: `award_level` (string), `clan_id` (numeric), `color` (string), `name` (string), `rank` (numeric), `rank_delta` (numeric), `tag` (string), `updated_at` (timestamp), `victory_points` (numeric), `victory_points_to_next_award` (numeric).
 
+Multiget: `prepareSeasonRatingNeighbors()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/seasonratingneighbors -->
 ```php
 // Instance call
@@ -2484,6 +2930,20 @@ $result = GlobalMap::seasonRatingNeighbors(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareSeasonRatingNeighbors(
+    seasonId: $seasonId,
+    vehicleLevel: '10',
+    clanId: $clanId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareSeasonRatingNeighbors(
+    seasonId: $seasonId,
+    vehicleLevel: '10',
+    clanId: $clanId,
+    limit: 10,
+);
 ```
 
 ### globalmap/events
@@ -2518,6 +2978,8 @@ GlobalMap::events(
 
 Top-level response fields: `end` (string), `event_id` (string), `event_name` (string), `fronts` (block_header), `start` (string), `status` (string).
 
+Multiget: `prepareEvents()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateEvents()` returns Generator of Record/null; `allEvents()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/events -->
@@ -2533,6 +2995,14 @@ $result = GlobalMap::events(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEvents(
+    limit: 10,
+);
+$operation = GlobalMap::prepareEvents(
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateEvents(
@@ -2589,6 +3059,8 @@ GlobalMap::eventClanInfo(
 
 Top-level response fields: `events` (block_header).
 
+Multiget: `prepareEventClanInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/eventclaninfo -->
 ```php
 // Instance call
@@ -2606,6 +3078,18 @@ $result = GlobalMap::eventClanInfo(
     clanId: $clanId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEventClanInfo(
+    eventId: $eventId,
+    frontIds: [$frontId],
+    clanId: $clanId,
+);
+$operation = GlobalMap::prepareEventClanInfo(
+    eventId: $eventId,
+    frontIds: [$frontId],
+    clanId: $clanId,
+);
 ```
 
 ### globalmap/eventaccountinfo
@@ -2638,6 +3122,8 @@ GlobalMap::eventAccountInfo(
 
 Top-level response fields: `events` (block_header).
 
+Multiget: `prepareEventAccountInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/eventaccountinfo -->
 ```php
 // Instance call
@@ -2655,6 +3141,18 @@ $result = GlobalMap::eventAccountInfo(
     accountId: $accountId,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEventAccountInfo(
+    eventId: $eventId,
+    frontIds: [$frontId],
+    accountId: $accountId,
+);
+$operation = GlobalMap::prepareEventAccountInfo(
+    eventId: $eventId,
+    frontIds: [$frontId],
+    accountId: $accountId,
+);
 ```
 
 ### globalmap/eventaccountratings
@@ -2689,6 +3187,8 @@ GlobalMap::eventAccountRatings(
 
 Top-level response fields: `account_id` (numeric), `award_level` (string), `battles` (numeric), `battles_to_award` (numeric), `clan_id` (numeric), `clan_rank` (numeric), `event_id` (string), `fame_points` (numeric), `fame_points_to_improve_award` (numeric), `front_id` (string), `rank` (numeric), `rank_delta` (numeric), `updated_at` (timestamp), `url` (string).
 
+Multiget: `prepareEventAccountRatings()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateEventAccountRatings()` returns Generator of Record/null; `allEventAccountRatings()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/eventaccountratings -->
@@ -2708,6 +3208,18 @@ $result = GlobalMap::eventAccountRatings(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEventAccountRatings(
+    eventId: $eventId,
+    frontId: $frontId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareEventAccountRatings(
+    eventId: $eventId,
+    frontId: $frontId,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateEventAccountRatings(
@@ -2778,6 +3290,8 @@ GlobalMap::eventAccountRatingNeighbors(
 
 Top-level response fields: `account_id` (numeric), `award_level` (string), `battles` (numeric), `battles_to_award` (numeric), `clan_id` (numeric), `clan_rank` (numeric), `event_id` (string), `fame_points` (numeric), `fame_points_to_improve_award` (numeric), `front_id` (string), `rank` (numeric), `rank_delta` (numeric), `updated_at` (timestamp), `url` (string).
 
+Multiget: `prepareEventAccountRatingNeighbors()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateEventAccountRatingNeighbors()` returns Generator of Record/null; `allEventAccountRatingNeighbors()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/eventaccountratingneighbors -->
@@ -2799,6 +3313,20 @@ $result = GlobalMap::eventAccountRatingNeighbors(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEventAccountRatingNeighbors(
+    eventId: $eventId,
+    frontId: $frontId,
+    accountId: $accountId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareEventAccountRatingNeighbors(
+    eventId: $eventId,
+    frontId: $frontId,
+    accountId: $accountId,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateEventAccountRatingNeighbors(
@@ -2869,6 +3397,8 @@ GlobalMap::eventRating(
 
 Top-level response fields: `award_level` (string), `battle_fame_points` (numeric), `clan_id` (numeric), `color` (string), `fame_points_to_improve_award` (numeric), `name` (string), `rank` (numeric), `rank_delta` (numeric), `tag` (string), `task_fame_points` (numeric), `total_fame_points` (numeric), `updated_at` (timestamp).
 
+Multiget: `prepareEventRating()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateEventRating()` returns Generator of Record/null; `allEventRating()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:globalmap/eventrating -->
@@ -2888,6 +3418,18 @@ $result = GlobalMap::eventRating(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEventRating(
+    eventId: $eventId,
+    frontId: $frontId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareEventRating(
+    eventId: $eventId,
+    frontId: $frontId,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->globalMap()->iterateEventRating(
@@ -2954,6 +3496,8 @@ GlobalMap::eventRatingNeighbors(
 
 Top-level response fields: `award_level` (string), `battle_fame_points` (numeric), `clan_id` (numeric), `color` (string), `fame_points_to_improve_award` (numeric), `name` (string), `rank` (numeric), `rank_delta` (numeric), `tag` (string), `task_fame_points` (numeric), `total_fame_points` (numeric), `updated_at` (timestamp).
 
+Multiget: `prepareEventRatingNeighbors()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/eventratingneighbors -->
 ```php
 // Instance call
@@ -2973,6 +3517,20 @@ $result = GlobalMap::eventRatingNeighbors(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareEventRatingNeighbors(
+    eventId: $eventId,
+    frontId: $frontId,
+    clanId: $clanId,
+    limit: 10,
+);
+$operation = GlobalMap::prepareEventRatingNeighbors(
+    eventId: $eventId,
+    frontId: $frontId,
+    clanId: $clanId,
+    limit: 10,
+);
 ```
 
 ### globalmap/info
@@ -2997,6 +3555,8 @@ GlobalMap::info(
 
 Top-level response fields: `last_turn` (numeric), `last_turn_calculated_at` (timestamp), `last_turn_created_at` (timestamp), `state` (string).
 
+Multiget: `prepareInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:globalmap/info -->
 ```php
 // Instance call
@@ -3006,6 +3566,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = GlobalMap::info();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->globalMap()->prepareInfo();
+$operation = GlobalMap::prepareInfo();
 ```
 
 ## stronghold
@@ -3036,6 +3600,8 @@ Stronghold::clanInfo(
 
 Top-level response fields: `battles_for_strongholds_statistics` (block_header), `battles_series_for_strongholds_statistics` (block_header), `building_slots` (block_header), `clan_id` (numeric), `clan_name` (string), `clan_tag` (string), `command_center_arena_id` (string), `skirmish_statistics` (block_header), `stronghold_buildings_level` (numeric), `stronghold_level` (numeric).
 
+Multiget: `prepareClanInfo()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:stronghold/claninfo -->
 ```php
 // Instance call
@@ -3049,6 +3615,14 @@ $result = Stronghold::clanInfo(
     clanIds: [$clanId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->stronghold()->prepareClanInfo(
+    clanIds: [$clanId],
+);
+$operation = Stronghold::prepareClanInfo(
+    clanIds: [$clanId],
+);
 ```
 
 ### stronghold/clanreserves
@@ -3077,6 +3651,8 @@ Stronghold::clanReserves(
 
 Top-level response fields: `bonus_type` (string), `disposable` (boolean), `icon` (string), `in_stock` (block_header), `name` (string), `type` (string).
 
+Multiget: `prepareClanReserves()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:stronghold/clanreserves -->
 ```php
 // Instance call
@@ -3090,6 +3666,14 @@ $result = Stronghold::clanReserves(
     accessToken: $token,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $client->stronghold()->prepareClanReserves(
+    accessToken: $token,
+);
+$operation = Stronghold::prepareClanReserves(
+    accessToken: $token,
+);
 ```
 
 ### stronghold/activateclanreserve
@@ -3173,6 +3757,8 @@ Ratings::types(
 
 Top-level response fields: `rank_fields` (list of strings), `threshold` (numeric), `type` (string).
 
+Multiget: `prepareTypes()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:ratings/types -->
 ```php
 // Instance call
@@ -3182,6 +3768,10 @@ $data = $result->data();
 // Static alternative; configure the corresponding client first.
 $result = Ratings::types();
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->ratings()->prepareTypes();
+$operation = Ratings::prepareTypes();
 ```
 
 ### ratings/dates
@@ -3216,6 +3806,8 @@ Ratings::dates(
 
 Top-level response fields: `dates` (list of timestamps).
 
+Multiget: `prepareDates()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:ratings/dates -->
 ```php
 // Instance call
@@ -3229,6 +3821,14 @@ $result = Ratings::dates(
     type: $ratingType,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->ratings()->prepareDates(
+    type: $ratingType,
+);
+$operation = Ratings::prepareDates(
+    type: $ratingType,
+);
 ```
 
 ### ratings/accounts
@@ -3265,6 +3865,8 @@ Ratings::accounts(
 
 Top-level response fields: `account_id` (numeric), `battles_count` (block_header), `battles_to_play` (numeric), `capture_points` (block_header), `damage_avg` (block_header), `damage_dealt` (block_header), `frags_avg` (block_header), `frags_count` (block_header), `global_rating` (block_header), `hits_ratio` (block_header), `spotted_avg` (block_header), `spotted_count` (block_header), `survived_ratio` (block_header), `wins_ratio` (block_header), `xp_amount` (block_header), `xp_avg` (block_header), `xp_max` (block_header).
 
+Multiget: `prepareAccounts()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:ratings/accounts -->
 ```php
 // Instance call
@@ -3280,6 +3882,16 @@ $result = Ratings::accounts(
     accountIds: [$accountId],
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->ratings()->prepareAccounts(
+    type: $ratingType,
+    accountIds: [$accountId],
+);
+$operation = Ratings::prepareAccounts(
+    type: $ratingType,
+    accountIds: [$accountId],
+);
 ```
 
 ### ratings/neighbors
@@ -3320,6 +3932,8 @@ Ratings::neighbors(
 
 Top-level response fields: `account_id` (numeric), `battles_count` (block_header), `battles_to_play` (numeric), `capture_points` (block_header), `damage_avg` (block_header), `damage_dealt` (block_header), `frags_avg` (block_header), `frags_count` (block_header), `global_rating` (block_header), `hits_ratio` (block_header), `spotted_avg` (block_header), `spotted_count` (block_header), `survived_ratio` (block_header), `wins_ratio` (block_header), `xp_amount` (block_header), `xp_avg` (block_header), `xp_max` (block_header).
 
+Multiget: `prepareNeighbors()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 <!-- example:ratings/neighbors -->
 ```php
 // Instance call
@@ -3339,6 +3953,20 @@ $result = Ratings::neighbors(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->ratings()->prepareNeighbors(
+    type: $ratingType,
+    accountId: $accountId,
+    rankField: $rankField,
+    limit: 10,
+);
+$operation = Ratings::prepareNeighbors(
+    type: $ratingType,
+    accountId: $accountId,
+    rankField: $rankField,
+    limit: 10,
+);
 ```
 
 ### ratings/top
@@ -3379,6 +4007,8 @@ Ratings::top(
 
 Top-level response fields: `account_id` (numeric), `battles_count` (block_header), `battles_to_play` (numeric), `capture_points` (block_header), `damage_avg` (block_header), `damage_dealt` (block_header), `frags_avg` (block_header), `frags_count` (block_header), `global_rating` (block_header), `hits_ratio` (block_header), `spotted_avg` (block_header), `spotted_count` (block_header), `survived_ratio` (block_header), `wins_ratio` (block_header), `xp_amount` (block_header), `xp_avg` (block_header), `xp_max` (block_header).
 
+Multiget: `prepareTop()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.
+
 Pagination: `iterateTop()` returns Generator of Record/null; `allTop()` returns ApiResult. Both accept the arguments above except pageNo, plus `int $startPage = 1` and `int $maxPages = 1000`. Exhausting the bound throws; all() retains all rows in memory.
 
 <!-- example:ratings/top -->
@@ -3398,6 +4028,18 @@ $result = Ratings::top(
     limit: 10,
 );
 $data = $result->data();
+
+// Prepare for multiget; instance and static alternatives (no I/O).
+$operation = $legacyClient->ratings()->prepareTop(
+    type: $ratingType,
+    rankField: $rankField,
+    limit: 10,
+);
+$operation = Ratings::prepareTop(
+    type: $ratingType,
+    rankField: $rankField,
+    limit: 10,
+);
 
 // Lazy traversal, or collect every page in memory.
 $records = $legacyClient->ratings()->iterateTop(
@@ -3539,6 +4181,8 @@ Auth::logout(
 ## Client and result helpers
 
 WotClient's public SDK helpers are independent of the 68 provider endpoints:
+
+Multiget: `$operation = $client->prepare('account/info', ['account_id' => [$accountId]]);` returns PreparedOperation without I/O. `$outcomes = $client->executeMany(['profile' => $operation], concurrency: 10);` returns keyed OperationOutcome objects; `Wot::executeMany()` is the static alternative. Read `result()` only when `succeeded()` is true; otherwise inspect `failure` and successful `parts`. See the [README](../README.md#multiget) for a full example.
 
 | Helper | Example / behavior |
 | --- | --- |

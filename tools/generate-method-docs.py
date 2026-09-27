@@ -215,6 +215,10 @@ for section, (group, accessor) in GROUPS.items():
             arguments.append(("limit", str(max(10, endpoint["parameters"]["limit"].get("min") or 1))))
         instance = "$legacyClient" if endpoint["deprecated"] else "$client"
         snippet = "// Instance call\n" + call(f"{instance}->{accessor}()->", method, arguments) + "\n$data = $result->data();\n\n// Static alternative; configure the corresponding client first.\n" + call(f"{group}::", method, arguments) + "\n$data = $result->data();"
+        if not endpoint["write"]:
+            prepared = "prepare" + method[0].upper() + method[1:]
+            lines += [f"Multiget: `{prepared}()` accepts identical arguments and returns PreparedOperation without network I/O. Submit it to `executeMany()`. A paginated preparation represents one page.", ""]
+            snippet += "\n\n// Prepare for multiget; instance and static alternatives (no I/O).\n" + call(f"{instance}->{accessor}()->", prepared, arguments, "$operation") + "\n" + call(f"{group}::", prepared, arguments, "$operation")
         if "page_no" in endpoint["parameters"]:
             suffix = method[0].upper() + method[1:]
             paged_arguments = arguments + [("maxPages", "100")]
@@ -260,6 +264,7 @@ for slug, (method, purpose, signature, result, arguments, assignment, parameters
 
 lines += ["## Client and result helpers", "",
           "WotClient's public SDK helpers are independent of the 68 provider endpoints:", "",
+          "Multiget: `$operation = $client->prepare('account/info', ['account_id' => [$accountId]]);` returns PreparedOperation without I/O. `$outcomes = $client->executeMany(['profile' => $operation], concurrency: 10);` returns keyed OperationOutcome objects; `Wot::executeMany()` is the static alternative. Read `result()` only when `succeeded()` is true; otherwise inspect `failure` and successful `parts`. See the [README](../README.md#multiget) for a full example.", "",
           "| Helper | Example / behavior |", "| --- | --- |",
           "| forRealm(Realm) | `$na = $client->forRealm(Realm::NA);` clones realm selection and shares the executor. |",
           "| request(path, parameters = [], token = null) | `$result = $client->request('account/info', ['account_id' => [$accountId]]);` uses API snake_case keys and validates the documented path. |",

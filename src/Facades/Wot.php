@@ -23,6 +23,15 @@ final class Wot
         self::$client = null;
     }
 
+    /**
+     * @param array<int|string, \edrard\WotClient\PreparedOperation> $operations
+     * @return array<int|string, \edrard\WotClient\OperationOutcome>
+     */
+    public static function executeMany(#[\SensitiveParameter] array $operations, int $concurrency = 10): array
+    {
+        return self::client()->executeMany($operations, $concurrency);
+    }
+
     public static function client(): WotClient
     {
         return self::$client ?? throw new LogicException('Configure the Wot facade before use.');

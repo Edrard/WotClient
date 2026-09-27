@@ -60,14 +60,14 @@ def generate_method(path, endpoint, operation="request", facade=False):
     name = METHODS.get(slug, slug)
     if operation != "request":
         name = operation + name[0].upper() + name[1:]
-    parameters = [(n, s) for n, s in endpoint["parameters"].items() if n != "application_id" and (operation == "request" or n != "page_no")]
+    parameters = [(n, s) for n, s in endpoint["parameters"].items() if n != "application_id" and (operation in ["request", "prepare"] or n != "page_no")]
     parameters.sort(key=lambda pair: not pair[1]["required"])
     args = [parameter(n, s) for n, s in parameters]
     signatures = [x[2] for x in args]
     docs = [x[3] for x in args if x[3]]
-    if operation != "request":
+    if operation in ["iterate", "all"]:
         signatures += ["int $startPage = 1", "int $maxPages = 1000"]
-    result_type = "Generator" if operation == "iterate" else "ApiResult"
+    result_type = "PreparedOperation" if operation == "prepare" else ("Generator" if operation == "iterate" else "ApiResult")
     if operation == "iterate":
         docs.append("@return Generator<array-key, Record|null>")
     docs.insert(0, f"{path}; see the official reference linked in docs/ENDPOINTS.md.")
@@ -86,7 +86,7 @@ def generate_method(path, endpoint, operation="request", facade=False):
     lines.append("    {")
     if facade:
         values = ["$" + x[1] for x in args]
-        if operation != "request":
+        if operation in ["iterate", "all"]:
             values += ["$startPage", "$maxPages"]
         call = f"        return Wot::client()->{accessor}()->{name}("
         if len(call + ", ".join(values)) > 110:
@@ -103,7 +103,7 @@ def generate_method(path, endpoint, operation="request", facade=False):
         lines += [f"                '{x[0]}' => ${x[1]}," for x in args if x[0] != "access_token"]
         lines.append("            ],")
         lines.append(f"            {token},")
-        if operation != "request":
+        if operation in ["iterate", "all"]:
             lines += ["            $startPage,", "            $maxPages,"]
         lines.append("        );")
     lines += ["    }", ""]
@@ -117,7 +117,7 @@ for section, (group, accessor) in GROUPS.items():
     for facade in [False, True]:
         namespace = "Facades" if facade else "Services"
         parts = ["<?php", "", "declare(strict_types=1);", "", f"namespace edrard\\WotClient\\{namespace};", "",
-                 "use edrard\\WgAuth\\AccessToken;", "use edrard\\WotClient\\ApiResult;", "use edrard\\WotClient\\Record;", "use Generator;", "use SensitiveParameter;", "",
+                 "use edrard\\WgAuth\\AccessToken;", "use edrard\\WotClient\\ApiResult;", "use edrard\\WotClient\\PreparedOperation;", "use edrard\\WotClient\\Record;", "use Generator;", "use SensitiveParameter;", "",
                  "/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */",
                  f"final {'class' if facade else 'readonly class'} {group}" + ("" if facade else " extends Service"), "{"]
         for path, endpoint in snapshot["endpoints"].items():
@@ -125,6 +125,9 @@ for section, (group, accessor) in GROUPS.items():
                 continue
             body, name = generate_method(path, endpoint, facade=facade)
             parts.append(body)
+            if not endpoint["write"]:
+                prepared, _ = generate_method(path, endpoint, operation="prepare", facade=facade)
+                parts.append(prepared)
             paged = "page_no" in endpoint["parameters"]
             if paged:
                 for operation in ["iterate", "all"]:

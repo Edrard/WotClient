@@ -6,6 +6,7 @@ namespace edrard\WotClient\Services;
 
 use edrard\WgAuth\AccessToken;
 use edrard\WotClient\ApiResult;
+use edrard\WotClient\PreparedOperation;
 use edrard\WotClient\Record;
 use Generator;
 use SensitiveParameter;
@@ -32,6 +33,24 @@ final readonly class Stronghold extends Service
     }
 
     /**
+     * stronghold/claninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<int> $clanIds
+     * @param list<string> $fields
+     */
+    public function prepareClanInfo(array $clanIds, array $fields = [], string|null $language = null): PreparedOperation
+    {
+        return $this->client->prepare(
+            'stronghold/claninfo',
+            [
+                'clan_id' => $clanIds,
+                'fields' => $fields,
+                'language' => $language,
+            ],
+            null,
+        );
+    }
+
+    /**
      * stronghold/clanreserves; see the official reference linked in docs/ENDPOINTS.md.
      * @param list<string> $fields
      */
@@ -41,6 +60,25 @@ final readonly class Stronghold extends Service
         string|null $language = null,
     ): ApiResult {
         return $this->client->request(
+            'stronghold/clanreserves',
+            [
+                'fields' => $fields,
+                'language' => $language,
+            ],
+            $accessToken,
+        );
+    }
+
+    /**
+     * stronghold/clanreserves; see the official reference linked in docs/ENDPOINTS.md.
+     * @param list<string> $fields
+     */
+    public function prepareClanReserves(
+        #[SensitiveParameter] AccessToken $accessToken,
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
+        return $this->client->prepare(
             'stronghold/clanreserves',
             [
                 'fields' => $fields,
