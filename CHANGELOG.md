@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 — 2026-09-27
+
+- Update README SDK/install versions and local development override to the multiget release; place the multiget example after client setup and include example account IDs. No runtime changes.
+
 ## 1.1.0 — 2026-09-27
 
 - Add immutable PreparedOperation, prepare methods for all 64 read endpoints on instance/static services, and keyed executeMany outcomes.

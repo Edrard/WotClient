@@ -1,43 +1,12 @@
 # WotClient — World of Tanks API for PHP 8.5
 
-## Multiget
-
-```php
-$operations = [
-    'profiles' => $client->accounts()->prepareInfo($accountIds),
-    'vehicles' => $client->accounts()->prepareTanks($accountIds),
-    'achievements' => $client->accounts()->prepareAchievements($accountIds),
-];
-$outcomes = $client->executeMany($operations, concurrency: 10);
-foreach ($outcomes as $name => $outcome) {
-    if ($outcome->succeeded()) {
-        $data = $outcome->result()->data();
-        continue;
-    }
-    $failure = $outcome->failure; // kind, providerCode, retryable, attempts, retryAfter
-    foreach ($outcome->parts as $part) {
-        if ($part->succeeded()) {
-            $completedChunk = $part->result()->data();
-        }
-    }
-}
-```
-
-Every read method has a `prepare…()` counterpart with identical typed arguments, including static group facades. Preparation validates without network I/O. `Wot::executeMany($operations, concurrency: 10)` uses the configured client. Operations retain their realm and may mix EU, NA and ASIA. See the [complete method reference](docs/METHODS.md) for each preparation example. A prepared paginated method fetches one page; existing pagination helpers remain available.
-
-The client splits required ID lists at each endpoint's provider limit, then submits all HTTP chunks to one shared WgDataGetter queue. Concurrency (1–10) bounds actual HTTP requests across operations and chunks. WgDataGetter alone owns transport retries, retrying only transient failed GET requests. Outcomes preserve caller keys/order. Failed operations retain successful chunks in `parts`; `result()` never returns incomplete data as a successful complete result. Invalid preparation fails before I/O. Infrastructure exceptions may still propagate.
-
-Synchronous RequestExecutorInterface implementations remain supported. Custom multiget executors implement BatchRequestExecutorInterface; injected getters implement SettledDataGetterInterface. Provider writes and authentication retain their existing explicit methods.
-
-Private multiget reads accept a verified WgAuth AccessToken and use authenticated HTTPS GET through WgDataGetter. Tokens can therefore appear in transport URLs: do not log raw parameters, URLs or private responses. Library debug output and failures redact credentials. Synchronous token requests still use POST. Responses have no package-defined size cap.
-
 Explicit typed methods for WoT EU, NA and ASIA, response validation, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
 
 WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.x (authentication). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
 
 ## API version and documentation
 
-**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.0.1.**
+**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.1.1.**
 
 WG's [request format guide](https://developers.wargaming.net/documentation/guide/getting-started/#request-format) defines the API_name URL segment as the API version; the reviewed World of Tanks methods use `wot`. The reviewed contracts do not expose a separate numeric API version. This identifier is separate from the game version returned by encyclopedia/info and this library's semantic version.
 
@@ -47,7 +16,7 @@ The [complete method reference](docs/METHODS.md) documents **all 68 available ca
 
 ## Installation
 
-Composer package: `edrard/wotclient`; stable constraint: `^1.0`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
+Composer package: `edrard/wotclient`; stable constraint: `^1.1`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
 
 Until registration on Packagist, declare **all four repositories in the consuming application's root composer.json**. Composer does not inherit repositories from dependencies:
 
@@ -59,11 +28,11 @@ Until registration on Packagist, declare **all four repositories in the consumin
         { "type": "vcs", "url": "https://github.com/Edrard/WgDataGetter.git" },
         { "type": "vcs", "url": "https://github.com/Edrard/WgAuth.git" }
     ],
-    "require": { "php": "^8.5", "edrard/wotclient": "^1.0" }
+    "require": { "php": "^8.5", "edrard/wotclient": "^1.1" }
 }
 ```
 
-Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.0.1`; production builds should resolve versioned sources.
+Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.1.1`; production builds should resolve versioned sources.
 
 ## Instance client
 
@@ -111,6 +80,40 @@ try {
 ```
 
 All group facades delegate to the configured client with the same explicit signatures and named arguments. There is no magic `__callStatic`, hidden environment lookup or second implementation. Configure before use; otherwise a LogicException is raised. Facade configuration is process-local mutable state: prefer instance injection for applications, concurrent work and multi-tenant workers; reset between independent jobs. Independent clients may use different IDs, realms, languages and executors.
+
+## Multiget
+
+Use the client configured above and account IDs for the same realm:
+
+```php
+$accountIds = [500000001, 500000002];
+$operations = [
+    'profiles' => $client->accounts()->prepareInfo($accountIds),
+    'vehicles' => $client->accounts()->prepareTanks($accountIds),
+    'achievements' => $client->accounts()->prepareAchievements($accountIds),
+];
+$outcomes = $client->executeMany($operations, concurrency: 10);
+foreach ($outcomes as $name => $outcome) {
+    if ($outcome->succeeded()) {
+        $data = $outcome->result()->data();
+        continue;
+    }
+    $failure = $outcome->failure; // kind, providerCode, retryable, attempts, retryAfter
+    foreach ($outcome->parts as $part) {
+        if ($part->succeeded()) {
+            $completedChunk = $part->result()->data();
+        }
+    }
+}
+```
+
+Every read method has a `prepare…()` counterpart with identical typed arguments, including static group facades. Preparation validates without network I/O. `Wot::executeMany($operations, concurrency: 10)` uses the configured client. Operations retain their realm and may mix EU, NA and ASIA. See the [complete method reference](docs/METHODS.md) for each preparation example. A prepared paginated method fetches one page; existing pagination helpers remain available.
+
+The client splits required ID lists at each endpoint's provider limit, then submits all HTTP chunks to one shared WgDataGetter queue. Concurrency (1–10) bounds actual HTTP requests across operations and chunks. WgDataGetter alone owns transport retries, retrying only transient failed GET requests. Outcomes preserve caller keys/order. Failed operations retain successful chunks in `parts`; `result()` never returns incomplete data as a successful complete result. Invalid preparation fails before I/O. Infrastructure exceptions may still propagate.
+
+Synchronous RequestExecutorInterface implementations remain supported. Custom multiget executors implement BatchRequestExecutorInterface; injected getters implement SettledDataGetterInterface. Provider writes and authentication retain their existing explicit methods.
+
+Private multiget reads accept a verified WgAuth AccessToken and use authenticated HTTPS GET through WgDataGetter. Tokens can therefore appear in transport URLs: do not log raw parameters, URLs or private responses. Library debug output and failures redact credentials. Synchronous token requests still use POST. Responses have no package-defined size cap.
 
 ## API groups and coverage
 
