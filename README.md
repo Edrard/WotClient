@@ -2,11 +2,11 @@
 
 Explicit typed methods for WoT EU, NA and ASIA, response validation, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
 
-WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.2+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
+WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.2+ (GET transport, WG envelopes and single-attempt multiget) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.2+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
 
 ## API version and documentation
 
-**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.1.3.**
+**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.2.0.**
 
 WG's [request format guide](https://developers.wargaming.net/documentation/guide/getting-started/#request-format) defines the API_name URL segment as the API version; the reviewed World of Tanks methods use `wot`. The reviewed contracts do not expose a separate numeric API version. This identifier is separate from the game version returned by encyclopedia/info and this library's semantic version.
 
@@ -16,7 +16,7 @@ The [complete method reference](docs/METHODS.md) documents **all 68 available ca
 
 ## Installation
 
-Composer package: `edrard/wotclient`; stable constraint: `^1.1.3`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
+Composer package: `edrard/wotclient`; stable constraint: `^1.2.0`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
 
 Until registration on Packagist, declare **all four repositories in the consuming application's root composer.json**. Composer does not inherit repositories from dependencies:
 
@@ -28,11 +28,11 @@ Until registration on Packagist, declare **all four repositories in the consumin
         { "type": "vcs", "url": "https://github.com/Edrard/WgDataGetter.git" },
         { "type": "vcs", "url": "https://github.com/Edrard/WgAuth.git" }
     ],
-    "require": { "php": "^8.5", "edrard/wotclient": "^1.1.3" }
+    "require": { "php": "^8.5", "edrard/wotclient": "^1.2.0" }
 }
 ```
 
-Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.1.3`; production builds should resolve versioned sources.
+Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.2.0`; production builds should resolve versioned sources.
 
 ## Instance client
 
@@ -109,9 +109,9 @@ foreach ($outcomes as $name => $outcome) {
 
 Every read method has a `prepare…()` counterpart with identical typed arguments, including static group facades. Preparation validates without network I/O. `Wot::executeMany($operations, concurrency: 10)` uses the configured client. Operations retain their realm and may mix EU, NA and ASIA. See the [complete method reference](docs/METHODS.md) for each preparation example. A prepared paginated method fetches one page; existing pagination helpers remain available.
 
-The client splits required ID lists at each endpoint's provider limit, then submits all HTTP chunks to one shared WgDataGetter queue. Concurrency (1–10) bounds actual HTTP requests across operations and chunks. WgDataGetter alone owns transport retries, retrying only transient failed GET requests. Outcomes preserve caller keys/order. Failed operations retain successful chunks in `parts`; `result()` never returns incomplete data as a successful complete result. Invalid preparation fails before I/O. Infrastructure exceptions may still propagate.
+The client splits required ID lists at each endpoint's provider limit, then submits all HTTP chunks to one shared WgDataGetter queue. Concurrency (1–10) bounds actual HTTP requests across operations and chunks. Multiget executes each wire request once, including 429/504; the caller owns retries, request resizing and cooldown. Legacy synchronous GET calls retain their configured transport RetryPolicy. Outcomes preserve caller keys/order. Failed operations retain successful chunks in `parts`; `result()` never returns incomplete data as a successful complete result. Invalid preparation fails before I/O. Infrastructure exceptions may still propagate.
 
-Synchronous RequestExecutorInterface implementations remain supported. Custom multiget executors implement BatchRequestExecutorInterface; injected getters implement SettledDataGetterInterface. Provider writes and authentication retain their existing explicit methods.
+Synchronous RequestExecutorInterface implementations remain supported. Custom multiget executors implement BatchRequestExecutorInterface; injected getters implement SingleAttemptDataGetterInterface. Provider writes and authentication retain their existing explicit methods.
 
 Private multiget reads accept a verified WgAuth AccessToken and use authenticated HTTPS GET through WgDataGetter. Tokens can therefore appear in transport URLs: do not log raw parameters, URLs or private responses. Library debug output and failures redact credentials. Synchronous token requests still use POST. Responses have no package-defined size cap.
 
@@ -229,3 +229,74 @@ Official sources: [WoT reference](https://developers.wargaming.net/reference/all
 Dependency updates: run `composer update "edrard/*" --with-all-dependencies --prefer-stable` in the consuming application to upgrade the WG complex to the latest versions allowed by its constraints. Caret constraints allow compatible upgrades; `composer install` preserves the lock file. Dependency repositories must be declared in the application root.
 
 Parameter validation marks its parameter array SensitiveParameter, including rejected raw access_token input, so validation exception traces redact it when zend.exception_ignore_args=0.
+
+## Caller-sized batches (N values, K per request)
+
+```php
+$operations = $client->prepareBatch('account/info', range(1, 250), batchSize: 25);
+$outcomes = $client->executeMany($operations, concurrency: 10); // ten requests of 25 IDs
+foreach ($outcomes as $index => $outcome) {
+    if ($outcome->succeeded()) {
+        $data = $outcome->result()->data();
+    } else {
+        foreach ($outcome->failures() as $failure) {
+            // Safe kind/providerCode/attempts/retryAfter; decide recovery in the application.
+        }
+        foreach ($outcome->parts as $part) {
+            $requested = $part->request->parameters(); // Application data; do not log private parameters.
+        }
+    }
+}
+
+$names = $client->prepareBatch('account/list', ['PlayerOne', 'PlayerTwo', 'PlayerThree'], 2);
+$nameOutcomes = $client->executeMany($names); // exact searches: two names, then one
+
+Wot::configure($client);
+$prepared = Wot::prepareBatch('account/info', [1, 2, 3], 2);
+$staticOutcomes = Wot::executeMany($prepared);
+Wot::reset();
+```
+
+prepareBatch(path, values, batchSize, parameters=[], accessToken=null) accepts a list of IDs or exact account names and returns PreparedOperation objects without I/O. K must fit the selected endpoint's documented limit; an invalid K is rejected before execution, rather than silently replaced. Empty values produce no operations. Other endpoint arguments go in parameters. Exact account names must be supplied individually without commas; type=exact is selected automatically. Parameter names, values, realm and tokens use the same endpoint validation as ordinary methods.
+
+executeMany returns one keyed outcome per prepared operation. Each wire part retains its request identity and every failure is available through failures(); the compatibility summary failure combines retryability and the largest Retry-After. This is diagnostic metadata, not a client recovery policy. WgBatch repacks missing values and repeats operations. Existing methods still support mechanical splitting at provider maxima when no explicit K is supplied.
+
+## Mix API methods in one multiget
+
+For one account, all three requests share one concurrency pool:
+
+```php
+$outcomes = $client->executeMany([
+    'info' => $client->accounts()->prepareInfo([123]),
+    'tanks' => $client->accounts()->prepareTanks([123]),
+    'achievements' => $client->accounts()->prepareAchievements([123]),
+], concurrency: 10);
+
+if ($outcomes['info']->succeeded()) {
+    $information = $outcomes['info']->result()->data();
+}
+// Inspect tanks and achievements independently; one failure does not discard siblings.
+```
+
+For a group, specify K and combine prepared requests from different methods:
+
+```php
+$ids = range(1, 250);
+$operations = [];
+foreach (['account/info', 'account/tanks', 'account/achievements'] as $method) {
+    foreach ($client->prepareBatch($method, $ids, batchSize: 25) as $index => $operation) {
+        $operations[$method.':'.$index] = $operation;
+    }
+}
+$outcomes = $client->executeMany($operations, concurrency: 10);
+foreach ($outcomes as $key => $outcome) {
+    if ($outcome->succeeded()) {
+        $data = $outcome->result()->data();
+    } else {
+        $failures = $outcome->failures();
+        // Pass this outcome to the application's recovery policy; do not log private parameters.
+    }
+}
+```
+
+This prepares 30 requests (10 for each method), with at most 10 actual HTTP requests outstanding across all methods. Caller keys and outcomes are preserved. Preparation sends nothing; executeMany executes each request once. WgBatch owns subsequent recovery and adaptive K, separately for each dataset's missing IDs.

@@ -17,14 +17,14 @@
     "require": {
         "php": "^8.5",
         "edrard/wgapi": "^2.0",
-        "edrard/wggetter": "^2.1",
+        "edrard/wggetter": "^2.2",
         "edrard/wgauth": "^1.0.2",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.11"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
-        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan": "^2.2",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
     "autoload": { "psr-4": { "edrard\\WotClient\\": "src/" } },
@@ -36,5 +36,5 @@
         "format:check": "php-cs-fixer fix --dry-run --diff"
     },
     "config": { "sort-packages": true },
-    "extra": { "branch-alias": { "dev-main": "1.1.x-dev" } }
+    "extra": { "branch-alias": { "dev-main": "1.2.x-dev" } }
 }

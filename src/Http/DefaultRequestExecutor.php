@@ -16,7 +16,7 @@ use edrard\WgGetter\WgDataGetter;
 use edrard\WgGetter\IntervalRateLimiter;
 use edrard\WotClient\ClientException;
 use edrard\WotClient\Contracts\BatchRequestExecutorInterface;
-use edrard\WgGetter\Contracts\SettledDataGetterInterface;
+use edrard\WgGetter\Contracts\SingleAttemptDataGetterInterface;
 use edrard\WotClient\PreparedOperation;
 use edrard\WgGetter\RequestOutcome;
 use edrard\WotClient\InvalidResponseException;
@@ -111,8 +111,8 @@ final class DefaultRequestExecutor implements BatchRequestExecutorInterface
     /** @param list<PreparedOperation> $requests @return array<int, RequestOutcome> */
     public function executeMany(#[SensitiveParameter] array $requests, int $concurrency): array
     {
-        if (!$this->getter instanceof SettledDataGetterInterface) {
-            throw new \LogicException('The getter does not support settled multiget.');
+        if (!$this->getter instanceof SingleAttemptDataGetterInterface) {
+            throw new \LogicException('The getter does not support single-attempt multiget.');
         }
         $this->getter->cleanUrls();
         try {
@@ -128,7 +128,7 @@ final class DefaultRequestExecutor implements BatchRequestExecutorInterface
                 $urls[$key] = $this->urls->getUrl($request->realm->value, 'wot/'.$section, $method, $parameters);
             }
             $this->getter->setUrls($urls);
-            return $this->getter->getEnvelopeOutcomes($concurrency);
+            return $this->getter->getEnvelopeOutcomesOnce($concurrency);
         } finally {
             $this->getter->cleanUrls();
         }

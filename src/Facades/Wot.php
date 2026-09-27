@@ -37,6 +37,16 @@ final class Wot
         return self::$client ?? throw new LogicException('Configure the Wot facade before use.');
     }
 
+    /**
+     * @param array<array-key, int|string> $values
+     * @param array<string, mixed> $parameters
+     * @return list<\edrard\WotClient\PreparedOperation>
+     */
+    public static function prepareBatch(string $path, #[\SensitiveParameter] array $values, int $batchSize, #[\SensitiveParameter] array $parameters = [], #[\SensitiveParameter] ?\edrard\WgAuth\AccessToken $accessToken = null): array
+    {
+        return self::client()->prepareBatch($path, $values, $batchSize, $parameters, $accessToken);
+    }
+
     public static function forRealm(Realm $realm): WotClient
     {
         return self::client()->forRealm($realm);

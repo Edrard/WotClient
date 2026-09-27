@@ -16,6 +16,57 @@ use PHPUnit\Framework\TestCase;
 
 final class MultigetTest extends TestCase
 {
+    public function testCallerSizedPreparationProducesTenRequestsAndRemainderWithoutSending(): void
+    {
+        $transport = new class () implements BatchTransportInterface {
+            public array $sizes = [];
+            public function send(array $urls, int $concurrency): array
+            {
+                $outcomes = [];
+                foreach ($urls as $key => $url) {
+                    parse_str(parse_url($url, PHP_URL_QUERY), $parameters);
+                    $ids = array_map('intval', explode(',', $parameters['account_id']));
+                    $this->sizes[] = count($ids);
+                    $outcomes[$key] = new HttpResult(200, json_encode(['status' => 'ok', 'data' => array_fill_keys($ids, null)], JSON_THROW_ON_ERROR));
+                }
+                return $outcomes;
+            }
+        };
+        $client = $this->client($transport);
+        $operations = $client->prepareBatch('account/info', range(1, 250), 25);
+        self::assertCount(10, $operations);
+        self::assertSame([], $transport->sizes);
+        $outcomes = $client->executeMany($operations, 10);
+        self::assertSame(array_fill(0, 10, 25), $transport->sizes);
+        self::assertCount(10, array_filter($outcomes, static fn ($outcome) => $outcome->succeeded()));
+        self::assertSame([25, 25, 1], array_map(static fn ($operation) => count($operation->parameters()['account_id']), $client->prepareBatch('account/info', range(1, 51), 25)));
+        $names = $client->prepareBatch('account/list', ['PlayerOne', 'PlayerTwo', 'PlayerThree'], 2);
+        self::assertSame(['PlayerOne,PlayerTwo', 'PlayerThree'], array_map(static fn ($operation) => $operation->parameters()['search'], $names));
+        self::assertSame('exact', $names[0]->parameters()['type']);
+        $this->expectException(\InvalidArgumentException::class);
+        $client->prepareBatch('account/info', [1], 101);
+    }
+
+    public function testMixedFailuresKeepAllCodesCooldownsAndRequestIdentities(): void
+    {
+        $transport = new class () implements BatchTransportInterface {
+            public function send(array $urls, int $concurrency): array
+            {
+                return [0 => new HttpResult(503), 1 => new HttpResult(429, retryAfter: 60), 2 => new HttpResult(403)];
+            }
+        };
+        $client = $this->client($transport);
+        $outcome = $client->executeMany([$client->accounts()->prepareInfo(range(1, 201))], 3)[0];
+        self::assertSame([503, 429, 403], array_map(static fn ($failure) => $failure->providerCode, $outcome->failures()));
+        self::assertSame(60.0, $outcome->failure->retryAfter);
+        self::assertFalse($outcome->failure->retryable);
+        self::assertSame(403, $outcome->failure->providerCode);
+        self::assertSame([[1, 100], [101, 200], [201, 201]], array_map(static function ($part) {
+            $ids = $part->request->parameters()['account_id'];
+            return [$ids[0], end($ids)];
+        }, $outcome->parts));
+    }
+
     private function client(BatchTransportInterface $transport): WotClient
     {
         $limiter = new class () implements RateLimiterInterface {

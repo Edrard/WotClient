@@ -114,6 +114,37 @@ final class WotClient
     }
 
     /**
+     * Mechanically split N values into caller-sized K requests, without execution or recovery.
+     * Exact account-name searches use parameter search and type=exact.
+     * @param array<array-key, int|string> $values
+     * @param array<string, mixed> $parameters
+     * @return list<PreparedOperation>
+     */
+    public function prepareBatch(string $path, #[SensitiveParameter] array $values, int $batchSize, #[SensitiveParameter] array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null): array
+    {
+        $endpoint = $this->registry->get($path);
+        $names = $path === 'account/list';
+        $parameter = $names ? 'search' : $endpoint['batchParameter'];
+        $maximum = $names ? 100 : ($endpoint['parameters'][$parameter]['maxItems'] ?? null);
+        if ($parameter === null || $batchSize < 1 || $maximum === null || $batchSize > $maximum || !array_is_list($values) || array_key_exists($parameter, $parameters)) {
+            throw new InvalidArgumentException('Invalid batch parameter or size for this endpoint.');
+        }
+        $operations = [];
+        foreach (array_chunk($values, $batchSize) as $chunk) {
+            if ($names) {
+                foreach ($chunk as $name) {
+                    if (!is_string($name) || str_contains($name, ',')) {
+                        throw new InvalidArgumentException('Expected individual exact account names.');
+                    }
+                }
+                $parameters['type'] = 'exact';
+            }
+            $operations[] = $this->prepare($path, array_replace($parameters, [$parameter => $names ? implode(',', $chunk) : $chunk]), $accessToken);
+        }
+        return $operations;
+    }
+
+    /**
      * @param array<int|string, PreparedOperation> $operations
      * @return array<int|string, OperationOutcome>
      */
@@ -157,24 +188,34 @@ final class WotClient
                 if (!$outcome->succeeded()) {
                     $error = $outcome->failure;
                     $partFailure = new OperationFailure($error->kind, $error->code, $error->retryable, $outcome->attempts, $error->retryAfter);
-                    $parts[] = new OperationOutcome(null, $partFailure);
-                    $failure ??= $partFailure;
+                    $parts[] = new OperationOutcome(null, $partFailure, request: $requests[$i]);
+                    $failure = $this->aggregateFailure($failure, $partFailure);
                     continue;
                 }
                 try {
                     $value = $this->responses->validate($endpoint, $outcome->envelope());
                     $this->combine($endpoint, [$batches[count($parts)]], [$value]);
                     $values[] = $value;
-                    $parts[] = new OperationOutcome($value);
+                    $parts[] = new OperationOutcome($value, request: $requests[$i]);
                 } catch (ClientException $error) {
                     $partFailure = new OperationFailure('invalid_response', $error->providerCode, attempts: $outcome->attempts);
-                    $parts[] = new OperationOutcome(null, $partFailure);
-                    $failure ??= $partFailure;
+                    $parts[] = new OperationOutcome(null, $partFailure, request: $requests[$i]);
+                    $failure = $this->aggregateFailure($failure, $partFailure);
                 }
             }
             $result[$key] = $failure === null ? new OperationOutcome($this->combine($endpoint, $batches, $values), parts: $parts) : new OperationOutcome(null, $failure, $parts);
         }
         return $result;
+    }
+
+    private function aggregateFailure(?OperationFailure $previous, OperationFailure $next): OperationFailure
+    {
+        if ($previous === null) {
+            return $next;
+        }
+        $selected = !$next->retryable && $previous->retryable ? $next : $previous;
+        $retryAfter = $previous->retryAfter === null && $next->retryAfter === null ? null : max($previous->retryAfter ?? 0.0, $next->retryAfter ?? 0.0);
+        return new OperationFailure($selected->kind, $selected->providerCode, $previous->retryable && $next->retryable, max($previous->attempts, $next->attempts), $retryAfter);
     }
 
     /**

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 - 2026-09-28
+
+- Add prepareBatch(path, values, batchSize, parameters, accessToken), including the static facade, for caller-sized N/K read requests and exact account names.
+- Execute multiget once per wire request through WgDataGetter ^2.2; collection retries and cooldown belong to the caller.
+- Preserve every part failure and its PreparedOperation identity; aggregate all retryability/Retry-After metadata without dropping later failures.
+- Retain existing endpoint-limit preparation, synchronous methods and successful partial data.
+
 ## 1.1.3 - 2026-09-28
 
 - Protect parameter arrays in validation stack traces, including rejected raw access tokens.
