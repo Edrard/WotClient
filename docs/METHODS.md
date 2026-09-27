@@ -1,6 +1,6 @@
 # Complete WoT method reference
 
-API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **2026-09-27**. SDK documentation: **1.2.0**.
+API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **2026-09-27**. SDK documentation: **1.2.1**.
 
 All 68 catalog methods are covered: 65 data/operation methods and three WgAuth methods. Each entry includes all SDK arguments, the mapped API parameters, return shape, instance and static examples. Pagination helpers are included where supported.
 

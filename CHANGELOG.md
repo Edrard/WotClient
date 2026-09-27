@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 - 2026-09-28
+
+- Keep caller-sized batch documentation in the generated method reference and update the generator SDK version.
+- Fix the generated-signature CI check; runtime behavior is unchanged from 1.2.0.
+
 ## 1.2.0 - 2026-09-28
 
 - Add prepareBatch(path, values, batchSize, parameters, accessToken), including the static facade, for caller-sized N/K read requests and exact account names.

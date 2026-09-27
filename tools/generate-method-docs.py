@@ -158,7 +158,7 @@ def call(target, method, arguments, assignment="$result"):
 
 assert set(PURPOSES) == set(snapshot["endpoints"]), "Every endpoint needs an original purpose summary."
 lines = ["# Complete WoT method reference", "",
-         "API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **" + snapshot["checkedAt"] + "**. SDK documentation: **1.0.1**.", "",
+         "API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **" + snapshot["checkedAt"] + "**. SDK documentation: **1.2.1**.", "",
          "All 68 catalog methods are covered: 65 data/operation methods and three WgAuth methods. Each entry includes all SDK arguments, the mapped API parameters, return shape, instance and static examples. Pagination helpers are included where supported.", "",
          "## Example setup and conventions", "",
          "Run the setup once in your application. Code blocks below are independent alternatives: choose the instance or static call. Do not run every block as a script.", "",
@@ -280,5 +280,5 @@ lines += ["## Client and result helpers", "",
           "| ApiResult record / records / object | `$row = $result->record($key); $rows = $result->records(); $object = $result->object();` supplies Record containers matching the response shape. |",
           "| Record get / has / string / integer / boolean / data | `$present = $row->has('nickname'); $name = $row->string('nickname'); $id = $row->integer('account_id'); $premium = $row->boolean('is_premium'); $statistics = $row->get('statistics'); $data = $row->data();` reads top-level fields; traverse nested arrays explicitly. |", "",
           "Refer to the README for error types, transport injection, quotas, private data handling and pagination failure semantics. Tests execute every method example against mock transports; no live authentication, revocation or reserve activation is performed.", ""]
-(ROOT / "docs/METHODS.md").write_text("\n".join(lines), encoding="utf-8")
+(ROOT / "docs/METHODS.md").write_text("\n".join(lines) + "\n" + (ROOT / "resources/batch-methods.md").read_text(encoding="utf-8"), encoding="utf-8")
 print("Generated reference and instance/static examples for all 68 methods.")

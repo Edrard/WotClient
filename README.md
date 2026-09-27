@@ -6,7 +6,7 @@ WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), 
 
 ## API version and documentation
 
-**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.2.0.**
+**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.2.1.**
 
 WG's [request format guide](https://developers.wargaming.net/documentation/guide/getting-started/#request-format) defines the API_name URL segment as the API version; the reviewed World of Tanks methods use `wot`. The reviewed contracts do not expose a separate numeric API version. This identifier is separate from the game version returned by encyclopedia/info and this library's semantic version.
 
@@ -16,7 +16,7 @@ The [complete method reference](docs/METHODS.md) documents **all 68 available ca
 
 ## Installation
 
-Composer package: `edrard/wotclient`; stable constraint: `^1.2.0`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
+Composer package: `edrard/wotclient`; stable constraint: `^1.2.1`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
 
 Until registration on Packagist, declare **all four repositories in the consuming application's root composer.json**. Composer does not inherit repositories from dependencies:
 
@@ -28,11 +28,11 @@ Until registration on Packagist, declare **all four repositories in the consumin
         { "type": "vcs", "url": "https://github.com/Edrard/WgDataGetter.git" },
         { "type": "vcs", "url": "https://github.com/Edrard/WgAuth.git" }
     ],
-    "require": { "php": "^8.5", "edrard/wotclient": "^1.2.0" }
+    "require": { "php": "^8.5", "edrard/wotclient": "^1.2.1" }
 }
 ```
 
-Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.2.0`; production builds should resolve versioned sources.
+Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.2.1`; production builds should resolve versioned sources.
 
 ## Instance client
 
