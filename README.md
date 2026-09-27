@@ -2,11 +2,11 @@
 
 Explicit typed methods for WoT EU, NA and ASIA, response validation, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
 
-WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.x (authentication). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
+WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.1+ (GET transport, WG envelopes, settled multiget and bounded retries) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.1+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
 
 ## API version and documentation
 
-**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.1.1.**
+**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.1.2.**
 
 WG's [request format guide](https://developers.wargaming.net/documentation/guide/getting-started/#request-format) defines the API_name URL segment as the API version; the reviewed World of Tanks methods use `wot`. The reviewed contracts do not expose a separate numeric API version. This identifier is separate from the game version returned by encyclopedia/info and this library's semantic version.
 
@@ -32,7 +32,7 @@ Until registration on Packagist, declare **all four repositories in the consumin
 }
 ```
 
-Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.1.1`; production builds should resolve versioned sources.
+Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.1.2`; production builds should resolve versioned sources.
 
 ## Instance client
 
@@ -196,7 +196,7 @@ RequestExecutorInterface is the transport boundary for test doubles and custom i
 
 Invalid arguments raise InvalidArgumentException. Provider, transport and pagination failures raise ClientException; invalid responses raise InvalidResponseException. Numeric providerCode/httpStatus are safe diagnostics. Default exceptions omit credentials, URLs, raw bodies and provider messages; credential-bearing transport exceptions are never chained. GET uses WgDataGetter's bounded retry policy; POST has no automatic retry. Timeouts are 15 seconds overall and 5 seconds to connect, TLS verification is enabled, redirects disabled. Custom executors must preserve these credential and mutation guarantees.
 
-The current development version (see CHANGELOG.md, Unreleased) reads complete POST response bodies without a package-defined byte limit. Injected Guzzle query defaults are cleared and transport debug is disabled. The directly used guzzlehttp/psr7 dependency (MIT) provides the stream-reading utilities. Custom transports/middleware must preserve credential protections.
+The stable release reads complete POST response bodies without a package-defined byte limit. Injected Guzzle query defaults are cleared and transport debug is disabled. The directly used guzzlehttp/psr7 dependency (MIT) provides the stream-reading utilities. Custom transports/middleware must preserve credential protections.
 
 ## Development and examples
 

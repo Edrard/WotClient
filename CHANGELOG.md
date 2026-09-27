@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2 — 2026-09-28
+
+- Require WgAuth ^1.0.1 so installations include cleared inherited POST query defaults, disabled debug output and complete authentication response reads without the former byte cap.
+- Refresh the dependency lock and document the stable dependency minimum; existing client methods are unchanged.
+
 ## 1.1.1 — 2026-09-27
 
 - Update README SDK/install versions and local development override to the multiget release; place the multiget example after client setup and include example account IDs. No runtime changes.

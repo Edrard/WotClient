@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b48a0371209f7ed75b59f674dcb8caa",
+    "content-hash": "e41a791aa51ce43979f34c62e2b3b896",
     "packages": [
         {
             "name": "edrard/wgapi",
@@ -78,16 +78,16 @@
         },
         {
             "name": "edrard/wgauth",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Edrard/WgAuth.git",
-                "reference": "8ae58600042fc4dbd68ad4c918905419649747cd"
+                "reference": "c39d10f9955689dfdf53688d2cf0f24872d77929"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Edrard/WgAuth/zipball/8ae58600042fc4dbd68ad4c918905419649747cd",
-                "reference": "8ae58600042fc4dbd68ad4c918905419649747cd",
+                "url": "https://api.github.com/repos/Edrard/WgAuth/zipball/c39d10f9955689dfdf53688d2cf0f24872d77929",
+                "reference": "c39d10f9955689dfdf53688d2cf0f24872d77929",
                 "shasum": ""
             },
             "require": {
@@ -96,6 +96,7 @@
                 "ext-filter": "*",
                 "ext-session": "*",
                 "guzzlehttp/guzzle": "^7.10",
+                "guzzlehttp/psr7": "^2.11",
                 "php": "^8.5"
             },
             "require-dev": {
@@ -147,7 +148,7 @@
                 "source": "https://github.com/Edrard/WgAuth",
                 "issues": "https://github.com/Edrard/WgAuth/issues"
             },
-            "time": "2026-09-26T21:25:40+00:00"
+            "time": "2026-09-27T20:58:28+00:00"
         },
         {
             "name": "edrard/wggetter",
