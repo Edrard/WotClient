@@ -16,6 +16,26 @@ use PHPUnit\Framework\TestCase;
 
 final class MultigetTest extends TestCase
 {
+    public function testPreparedExtraAndLanguageReachTheHttpQuery(): void
+    {
+        $transport = new class () implements BatchTransportInterface {
+            public function send(array $urls, int $concurrency): array
+            {
+                parse_str(parse_url($urls[0], PHP_URL_QUERY), $query);
+                TestCase::assertSame('ru', $query['language']);
+                TestCase::assertSame('statistics.random,statistics.epic', $query['extra']);
+
+                return [0 => new HttpResult(200, '{"status":"ok","data":{"1":null}}')];
+            }
+        };
+        $client = $this->client($transport);
+        $result = $client->executeMany([
+            $client->accounts()->prepareInfo([1], language: 'ru', extra: ['statistics.random', 'statistics.epic']),
+        ]);
+
+        self::assertSame([1 => null], $result[0]->result()->data());
+    }
+
     public function testCallerSizedPreparationProducesTenRequestsAndRemainderWithoutSending(): void
     {
         $transport = new class () implements BatchTransportInterface {
@@ -158,7 +178,7 @@ final class MultigetTest extends TestCase
         self::assertCount(1, $transport->calls[1][0]);
     }
 
-    public function testWrongResponseIdentityFailsOnlyAffectedOperationAndStaticApiWorks(): void
+    public function testResponseIdentityIsLeftForTheConsumerAndStaticApiWorks(): void
     {
         $transport = new class () implements BatchTransportInterface {
             public function send(array $urls, int $concurrency): array
@@ -170,7 +190,8 @@ final class MultigetTest extends TestCase
         Wot::configure($client);
         try {
             $outcomes = Wot::executeMany(['bad' => Wot::accounts()->prepareInfo([1]), 'ok' => Wot::accounts()->prepareInfo([2])]);
-            self::assertSame('invalid_response', $outcomes['bad']->failure->kind);
+            self::assertTrue($outcomes['bad']->succeeded());
+            self::assertSame([999 => null], $outcomes['bad']->result()->data());
             self::assertSame([2 => null], $outcomes['ok']->result()->data());
         } finally {
             Wot::reset();

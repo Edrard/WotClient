@@ -8,7 +8,7 @@ use RuntimeException;
 
 class ClientException extends RuntimeException
 {
-    public function __construct(string $message, public readonly ?int $providerCode = null, public readonly ?int $httpStatus = null)
+    public function __construct(string $message, public readonly ?int $providerCode = null, public readonly ?int $httpStatus = null, public readonly ?string $providerMessage = null)
     {
         parent::__construct($message);
     }

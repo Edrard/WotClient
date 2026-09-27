@@ -97,10 +97,9 @@ final class WotClient
         $parts = [];
         foreach ($batches as $batch) {
             $value = $this->responses->validate($endpoint, $this->executor->execute($this->realm, $path, $batch, $accessToken, $endpoint['write']));
-            $this->combine($endpoint, [$batch], [$value]);
             $parts[] = $value;
         }
-        return $this->combine($endpoint, $batches, $parts);
+        return $this->combine($endpoint, $parts);
     }
 
     /** @param array<string, mixed> $parameters */
@@ -187,23 +186,22 @@ final class WotClient
                 $outcome = $outcomes[$i];
                 if (!$outcome->succeeded()) {
                     $error = $outcome->failure;
-                    $partFailure = new OperationFailure($error->kind, $error->code, $error->retryable, $outcome->attempts, $error->retryAfter);
+                    $partFailure = new OperationFailure($error->kind, $error->code, $error->retryable, $outcome->attempts, $error->retryAfter, $error->providerMessage);
                     $parts[] = new OperationOutcome(null, $partFailure, request: $requests[$i]);
                     $failure = $this->aggregateFailure($failure, $partFailure);
                     continue;
                 }
                 try {
                     $value = $this->responses->validate($endpoint, $outcome->envelope());
-                    $this->combine($endpoint, [$batches[count($parts)]], [$value]);
                     $values[] = $value;
                     $parts[] = new OperationOutcome($value, request: $requests[$i]);
                 } catch (ClientException $error) {
-                    $partFailure = new OperationFailure('invalid_response', $error->providerCode, attempts: $outcome->attempts);
+                    $partFailure = new OperationFailure('invalid_response', $error->providerCode, attempts: $outcome->attempts, providerMessage: $error->providerMessage);
                     $parts[] = new OperationOutcome(null, $partFailure, request: $requests[$i]);
                     $failure = $this->aggregateFailure($failure, $partFailure);
                 }
             }
-            $result[$key] = $failure === null ? new OperationOutcome($this->combine($endpoint, $batches, $values), parts: $parts) : new OperationOutcome(null, $failure, $parts);
+            $result[$key] = $failure === null ? new OperationOutcome($this->combine($endpoint, $values), parts: $parts) : new OperationOutcome(null, $failure, $parts);
         }
         return $result;
     }
@@ -215,7 +213,7 @@ final class WotClient
         }
         $selected = !$next->retryable && $previous->retryable ? $next : $previous;
         $retryAfter = $previous->retryAfter === null && $next->retryAfter === null ? null : max($previous->retryAfter ?? 0.0, $next->retryAfter ?? 0.0);
-        return new OperationFailure($selected->kind, $selected->providerCode, $previous->retryable && $next->retryable, max($previous->attempts, $next->attempts), $retryAfter);
+        return new OperationFailure($selected->kind, $selected->providerCode, $previous->retryable && $next->retryable, max($previous->attempts, $next->attempts), $retryAfter, $selected->providerMessage);
     }
 
     /**
@@ -256,10 +254,9 @@ final class WotClient
 
     /**
      * @param array<string, mixed> $endpoint
-     * @param list<array<string, mixed>> $batches
      * @param list<ApiResult> $parts
      */
-    private function combine(array $endpoint, #[SensitiveParameter] array $batches, array $parts): ApiResult
+    private function combine(array $endpoint, array $parts): ApiResult
     {
         $data = [];
         $metadata = [];
@@ -267,15 +264,8 @@ final class WotClient
             $batchParameter = $endpoint['batchParameter'];
             if ($batchParameter !== null) {
                 $values = $result->data();
-                $ids = $batches[$i][$batchParameter];
-                if ($values === null || array_diff(array_keys($values), $ids) !== [] || array_diff($ids, array_keys($values)) !== []) {
-                    throw new InvalidResponseException();
-                }
-                foreach ($values as $key => $value) {
-                    if (array_key_exists($key, $data) || (is_array($value) && isset($value[$batchParameter]) && $value[$batchParameter] !== (int) $key)) {
-                        throw new InvalidResponseException();
-                    }
-                    $data[$key] = $value;
+                if (is_array($values)) {
+                    $data = array_replace($data, $values);
                 }
             }
             $metadata[] = $result->meta;
@@ -283,7 +273,7 @@ final class WotClient
         if (count($parts) === 1) {
             return $parts[0];
         }
-        return new ApiResult($data, ['count' => count($data), 'batches' => $metadata]);
+        return new ApiResult($data, ['count' => count($data), 'batches' => $metadata], parts: $parts);
     }
 
     /**

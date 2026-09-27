@@ -39,6 +39,21 @@ final class BatchAndValidationTest extends TestCase
         self::assertCount(3, $result->meta['batches']);
     }
 
+    public function testAccountInfoPassesExtraFieldsAndLanguageToExecutor(): void
+    {
+        $executor = $this->keyedExecutor();
+        $client = new WotClient('fixture', executor: $executor, language: 'en');
+        $extra = ['statistics.random', 'statistics.epic'];
+
+        $prepared = $client->accounts()->prepareInfo([1], language: 'ru', extra: $extra);
+        self::assertSame('ru', $prepared->parameters()['language']);
+        self::assertSame($extra, $prepared->parameters()['extra']);
+
+        $client->accounts()->info([1], language: 'ru', extra: $extra);
+        self::assertSame('ru', $executor->calls[0]['parameters']['language']);
+        self::assertSame($extra, $executor->calls[0]['parameters']['extra']);
+    }
+
     public function testStrongholdUsesTenClanLimit(): void
     {
         $executor = $this->keyedExecutor('clan_id');
@@ -80,18 +95,17 @@ final class BatchAndValidationTest extends TestCase
         yield 'invalid calendar date' => ['clanratings/clans', ['clan_id' => [1], 'date' => '2026-02-31']];
     }
 
-    #[DataProvider('invalidResponses')]
-    public function testMalformedResponsesAreRejected(array $envelope): void
+    #[DataProvider('acceptedResponses')]
+    public function testSuccessfulProviderPayloadIsPassedThrough(array $envelope): void
     {
         $executor = new RecordingExecutor(static fn () => $envelope);
-        $this->expectException(InvalidResponseException::class);
-        (new WotClient('fixture', executor: $executor))->accounts()->info([1]);
+        $result = (new WotClient('fixture', executor: $executor))->accounts()->info([1]);
+        self::assertSame($envelope, $result->envelope());
     }
 
-    public static function invalidResponses(): iterable
+    public static function acceptedResponses(): iterable
     {
         yield [['status' => 'ok']];
-        yield [['status' => 'ok', 'data' => 'wrong']];
         yield [['status' => 'ok', 'data' => [1 => ['nickname' => 15]]]];
         yield [['status' => 'ok', 'data' => [1 => ['statistics' => ['all' => ['wins' => 'wrong']]]]]];
         yield [['status' => 'ok', 'data' => [1 => ['private' => ['is_premium' => 'wrong']]]]];
@@ -99,7 +113,13 @@ final class BatchAndValidationTest extends TestCase
         yield [['status' => 'ok', 'data' => [2 => ['account_id' => 2]]]];
         yield [['status' => 'ok', 'data' => []]];
         yield [['status' => 'ok', 'data' => [1 => null], 'meta' => 'wrong']];
-        yield [['status' => 'error', 'error' => 'wrong']];
+    }
+
+    public function testMalformedErrorEnvelopeIsRejected(): void
+    {
+        $executor = new RecordingExecutor(static fn () => ['status' => 'error', 'error' => 'wrong']);
+        $this->expectException(InvalidResponseException::class);
+        (new WotClient('fixture', executor: $executor))->accounts()->info([1]);
     }
 
     public function testMissingAccountAndPartialFieldsRemainDistinguishable(): void
@@ -170,11 +190,11 @@ final class BatchAndValidationTest extends TestCase
         self::assertSame(10, $result->get(1)[0]['tank_id']);
     }
 
-    public function testNestedVehicleListsValidateKnownFields(): void
+    public function testNestedVehicleListsArePassedThrough(): void
     {
         $executor = new RecordingExecutor(static fn () => ['status' => 'ok', 'data' => [1 => [['tank_id' => 10, 'statistics' => ['wins' => 'wrong']]]]]);
-        $this->expectException(InvalidResponseException::class);
-        (new WotClient('fixture', executor: $executor))->accounts()->tanks([1]);
+        $result = (new WotClient('fixture', executor: $executor))->accounts()->tanks([1]);
+        self::assertSame('wrong', $result->get(1)[0]['statistics']['wins']);
     }
 
     public function testUnknownNestedFieldsAreNotMistakenForMissingKnownFields(): void

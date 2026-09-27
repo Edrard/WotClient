@@ -76,6 +76,6 @@ final class SecurityReviewTest extends TestCase
     {
         $client = new WotClient('fixture', executor: new RecordingExecutor(static fn () => ['status' => 'ok', 'data' => [1 => [123, 'invalid']]]));
         $this->expectException(InvalidResponseException::class);
-        $client->accounts()->info([1]);
+        $client->accounts()->info([1])->record(1);
     }
 }

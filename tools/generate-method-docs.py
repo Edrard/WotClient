@@ -158,7 +158,7 @@ def call(target, method, arguments, assignment="$result"):
 
 assert set(PURPOSES) == set(snapshot["endpoints"]), "Every endpoint needs an original purpose summary."
 lines = ["# Complete WoT method reference", "",
-         "API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **" + snapshot["checkedAt"] + "**. SDK documentation: **1.2.1**.", "",
+         "API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **" + snapshot["checkedAt"] + "**. SDK documentation: **2.0.0**.", "",
          "All 68 catalog methods are covered: 65 data/operation methods and three WgAuth methods. Each entry includes all SDK arguments, the mapped API parameters, return shape, instance and static examples. Pagination helpers are included where supported.", "",
          "## Example setup and conventions", "",
          "Run the setup once in your application. Code blocks below are independent alternatives: choose the instance or static call. Do not run every block as a script.", "",
@@ -209,6 +209,15 @@ for section, (group, accessor) in GROUPS.items():
         lines += ["", "**Result:** ApiResult. " + shape, "",
                   "Top-level response fields: " + (", ".join(f"`{n}` ({t})" for n, t in roots) or "See the official response schema.") + ".", ""]
         arguments = [(parameter(n, s)[1], example_value(n, s)) for n, s in parameters if s["required"]]
+        if path == "account/info":
+            arguments += [("language", "'ru'"), ("fields", "['account_id', 'nickname']"),
+                          ("extra", "['statistics.random', 'statistics.epic']")]
+        elif path == "encyclopedia/modules":
+            arguments.append(("extra", "['default_profile']"))
+        elif path == "tanks/stats":
+            arguments.append(("extra", "['random']"))
+        elif path == "clans/info":
+            arguments += [("accessToken", "$token"), ("extra", "['private.online_members']")]
         if path == "clans/list":
             arguments.append(("search", "'WOT'"))
         if "limit" in endpoint["parameters"]:

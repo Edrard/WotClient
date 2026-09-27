@@ -60,7 +60,7 @@ final class DefaultRequestExecutor implements BatchRequestExecutorInterface
             } catch (GetterInvalidResponse) {
                 throw new InvalidResponseException();
             } catch (RequestException $exception) {
-                throw new ClientException('WG GET request failed.', providerCode: $exception->getCode());
+                throw new ClientException('WG GET request failed.', providerCode: $exception->getCode(), providerMessage: $exception->providerMessage);
             } finally {
                 $this->getter->cleanUrls();
             }

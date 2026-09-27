@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a17d78b6b73db8e87fdb34def9e42594",
+    "content-hash": "268af2704d9de856401893c8d56565bf",
     "packages": [
         {
             "name": "edrard/wgapi",
@@ -152,16 +152,16 @@
         },
         {
             "name": "edrard/wggetter",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Edrard/WgDataGetter.git",
-                "reference": "15ba41fcb04eeb469936c181b3d7c42e1c568aab"
+                "reference": "e37752d95e1ef0c2fc35e3c4066b8d6a3f912f88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Edrard/WgDataGetter/zipball/15ba41fcb04eeb469936c181b3d7c42e1c568aab",
-                "reference": "15ba41fcb04eeb469936c181b3d7c42e1c568aab",
+                "url": "https://api.github.com/repos/Edrard/WgDataGetter/zipball/e37752d95e1ef0c2fc35e3c4066b8d6a3f912f88",
+                "reference": "e37752d95e1ef0c2fc35e3c4066b8d6a3f912f88",
                 "shasum": ""
             },
             "require": {
@@ -221,7 +221,7 @@
                 "source": "https://github.com/Edrard/WgDataGetter",
                 "issues": "https://github.com/Edrard/WgDataGetter/issues"
             },
-            "time": "2026-09-27T22:01:34+00:00"
+            "time": "2026-09-27T22:41:09+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

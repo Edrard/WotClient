@@ -1,12 +1,12 @@
 # WotClient — World of Tanks API for PHP 8.5
 
-Explicit typed methods for WoT EU, NA and ASIA, response validation, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
+Explicit typed methods for WoT EU, NA and ASIA, request construction, ID batching and lazy pagination. Each API group has its own service class and optional static facade. MIT; authored for Edrard.
 
-WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.2+ (GET transport, WG envelopes and single-attempt multiget) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.2+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
+WotClient composes [WgApi](https://github.com/Edrard/WgApi) 2.x (URL building), [WgDataGetter](https://github.com/Edrard/WgDataGetter) 2.3+ (GET transport, WG envelopes and single-attempt multiget) and [WgAuth](https://github.com/Edrard/WgAuth) 1.0.2+ (authentication with credential-safe transport defaults). These are MIT dependencies; Guzzle 7 (MIT) provides the POST transport. WgParser processes collected statistics separately and is not required by this client. No Laravel dependency, database, scheduler or automatic server-wide scan is introduced.
 
 ## API version and documentation
 
-**API version/namespace: `wot`; endpoint prefix: `/wot/`. Reviewed contract date: 2026-09-27. SDK release: 1.2.1.**
+**API version/namespace: `wot`; endpoint prefix: `/wot/`. Contract snapshot: 2026-09-27. SDK release: 2.0.0.**
 
 WG's [request format guide](https://developers.wargaming.net/documentation/guide/getting-started/#request-format) defines the API_name URL segment as the API version; the reviewed World of Tanks methods use `wot`. The reviewed contracts do not expose a separate numeric API version. This identifier is separate from the game version returned by encyclopedia/info and this library's semantic version.
 
@@ -16,7 +16,7 @@ The [complete method reference](docs/METHODS.md) documents **all 68 available ca
 
 ## Installation
 
-Composer package: `edrard/wotclient`; stable constraint: `^1.2.1`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
+Composer package: `edrard/wotclient`; stable constraint: `^2.0`. Requires PHP `^8.5` and the extensions required by the WG dependencies (including curl, ctype, filter and session).
 
 Until registration on Packagist, declare **all four repositories in the consuming application's root composer.json**. Composer does not inherit repositories from dependencies:
 
@@ -28,11 +28,11 @@ Until registration on Packagist, declare **all four repositories in the consumin
         { "type": "vcs", "url": "https://github.com/Edrard/WgDataGetter.git" },
         { "type": "vcs", "url": "https://github.com/Edrard/WgAuth.git" }
     ],
-    "require": { "php": "^8.5", "edrard/wotclient": "^1.2.1" }
+    "require": { "php": "^8.5", "edrard/wotclient": "^2.0" }
 }
 ```
 
-Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 1.2.1`; production builds should resolve versioned sources.
+Run `composer install`, or `composer update` when adding the package to an existing project. Local development can replace the WotClient VCS entry with a path repository and `options.versions.edrard/wotclient = 2.0.0`; production builds should resolve versioned sources.
 
 ## Instance client
 
@@ -48,7 +48,9 @@ $client = new WotClient($id, realm: Realm::EU); // one ID explicitly applies to 
 
 $accounts = $client->accounts()->info(
     accountIds: [500000001, 500000002],
+    language: 'ru',
     fields: ['account_id', 'nickname', 'statistics.all.battles'],
+    extra: ['statistics.random', 'statistics.epic'],
 );
 $account = $accounts->record(500000001); // null for an unavailable account
 $nickname = $account?->string('nickname');
@@ -57,6 +59,8 @@ $players = $client->accounts()->search('Player', limit: 10);
 $clans = $client->clans()->search(search: 'WOT', limit: 10);
 $asia = $client->forRealm(Realm::ASIA); // leaves the original client configured for EU
 ```
+
+Each generated method exposes the optional parameters WG documents for that endpoint. In the reviewed catalog, 63 data methods accept `fields`, 50 accept `language`, and four accept `extra`: `account/info`, `encyclopedia/modules`, `tanks/stats`, and `clans/info`. `extra` selectors differ by method. Use a verified `accessToken` for private extras such as `private.garage` or `private.online_members`. The [method reference](docs/METHODS.md) shows concrete `extra` examples for all four methods, including static and prepared calls.
 
 `accountIds` and other numeric lists take positive PHP integers, not numeric strings. Required account/clan/vehicle ID lists are deduplicated and split at each method's documented limit (for example account/info: 100, stronghold/claninfo: 10). Results retain absolute provider IDs; no region offset is added. Optional filter lists are validated against their limits and are not automatically split, because splitting arbitrary combinations can duplicate or change query results.
 
@@ -161,7 +165,7 @@ Pagination uses meta.page_total when provided; otherwise it continues until an e
 
 ApiResult provides `data()`, `meta`, `count()`, `has($key)`, `get($key)`, `record($key)`, `records()` and `object()`. Use `object()` for single-object responses such as encyclopedia/info; `get($accountId)` for list-valued entries such as account/tanks. Record supports `get()`, `has()`, `string()`, `integer()`, `boolean()` and explicit `data()` access.
 
-Validation covers known parameter types, required values, enums, list limits, documented numeric bounds, field selector syntax, search length, WG envelope shape and the documented response fields that are present, including nested rows. Unknown response fields are retained for forward compatibility. Selected-out fields are not required, null is preserved, and absent fields remain distinguishable through has(). Known IDs are checked against the requested batch. This validates structure, not the truth or freshness of WG statistics. Results are typed containers with explicit accessors; this release does not provide a separate entity DTO with properties for every provider field.
+Validation covers documented request parameter types, required values, enums, list limits, numeric bounds, field selector syntax and search length. A WG response with `status: "ok"` is passed through without validating account, tank or statistical fields; an ID mapped to `null` remains present. `ApiResult::envelope()` returns the original successful response, and `ApiResult::parts` retains original chunks when an ID request spans several HTTP calls. Error outcomes carry safe categories, numeric codes and allowlisted WG identifiers, not arbitrary provider text, URLs or credentials. WgBatch owns ID completeness and retries; WgParser interprets statistical content. The optional `record()` and `object()` accessors still require a record-like shape when explicitly used.
 
 Single-request results retain WG metadata. Automatically merged ID batches expose a count and each batch's original metadata under `meta.batches`; all-page results expose count and pages. A failed batch returns no partial ApiResult. Earlier rows already consumed from a lazy iterator cannot be rolled back.
 

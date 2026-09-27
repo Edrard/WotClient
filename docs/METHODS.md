@@ -1,6 +1,6 @@
 # Complete WoT method reference
 
-API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **2026-09-27**. SDK documentation: **1.2.1**.
+API version/namespace: **`wot`**, URL prefix **`/wot/`**. Contract reviewed **2026-09-27**. SDK documentation: **2.0.0**.
 
 All 68 catalog methods are covered: 65 data/operation methods and three WgAuth methods. Each entry includes all SDK arguments, the mapped API parameters, return shape, instance and static examples. Pagination helpers are included where supported.
 
@@ -138,21 +138,33 @@ Multiget: `prepareInfo()` accepts identical arguments and returns PreparedOperat
 // Instance call
 $result = $client->accounts()->info(
     accountIds: [$accountId],
+    language: 'ru',
+    fields: ['account_id', 'nickname'],
+    extra: ['statistics.random', 'statistics.epic'],
 );
 $data = $result->data();
 
 // Static alternative; configure the corresponding client first.
 $result = Accounts::info(
     accountIds: [$accountId],
+    language: 'ru',
+    fields: ['account_id', 'nickname'],
+    extra: ['statistics.random', 'statistics.epic'],
 );
 $data = $result->data();
 
 // Prepare for multiget; instance and static alternatives (no I/O).
 $operation = $client->accounts()->prepareInfo(
     accountIds: [$accountId],
+    language: 'ru',
+    fields: ['account_id', 'nickname'],
+    extra: ['statistics.random', 'statistics.epic'],
 );
 $operation = Accounts::prepareInfo(
     accountIds: [$accountId],
+    language: 'ru',
+    fields: ['account_id', 'nickname'],
+    extra: ['statistics.random', 'statistics.epic'],
 );
 ```
 
@@ -356,21 +368,25 @@ Multiget: `prepareStats()` accepts identical arguments and returns PreparedOpera
 // Instance call
 $result = $client->tanks()->stats(
     accountId: $accountId,
+    extra: ['random'],
 );
 $data = $result->data();
 
 // Static alternative; configure the corresponding client first.
 $result = Tanks::stats(
     accountId: $accountId,
+    extra: ['random'],
 );
 $data = $result->data();
 
 // Prepare for multiget; instance and static alternatives (no I/O).
 $operation = $client->tanks()->prepareStats(
     accountId: $accountId,
+    extra: ['random'],
 );
 $operation = Tanks::prepareStats(
     accountId: $accountId,
+    extra: ['random'],
 );
 ```
 
@@ -1374,26 +1390,31 @@ Pagination: `iterateModules()` returns Generator of Record/null; `allModules()` 
 ```php
 // Instance call
 $result = $client->encyclopedia()->modules(
+    extra: ['default_profile'],
     limit: 10,
 );
 $data = $result->data();
 
 // Static alternative; configure the corresponding client first.
 $result = Encyclopedia::modules(
+    extra: ['default_profile'],
     limit: 10,
 );
 $data = $result->data();
 
 // Prepare for multiget; instance and static alternatives (no I/O).
 $operation = $client->encyclopedia()->prepareModules(
+    extra: ['default_profile'],
     limit: 10,
 );
 $operation = Encyclopedia::prepareModules(
+    extra: ['default_profile'],
     limit: 10,
 );
 
 // Lazy traversal, or collect every page in memory.
 $records = $client->encyclopedia()->iterateModules(
+    extra: ['default_profile'],
     limit: 10,
     maxPages: 100,
 );
@@ -1401,12 +1422,14 @@ foreach ($records as $key => $record) {
     $row = $record?->data();
 }
 $all = $client->encyclopedia()->allModules(
+    extra: ['default_profile'],
     limit: 10,
     maxPages: 100,
 );
 
 // Static pagination alternatives.
 $records = Encyclopedia::iterateModules(
+    extra: ['default_profile'],
     limit: 10,
     maxPages: 100,
 );
@@ -1414,6 +1437,7 @@ foreach ($records as $key => $record) {
     $row = $record?->data();
 }
 $all = Encyclopedia::allModules(
+    extra: ['default_profile'],
     limit: 10,
     maxPages: 100,
 );
@@ -1680,21 +1704,29 @@ Multiget: `prepareInfo()` accepts identical arguments and returns PreparedOperat
 // Instance call
 $result = $client->clans()->info(
     clanIds: [$clanId],
+    accessToken: $token,
+    extra: ['private.online_members'],
 );
 $data = $result->data();
 
 // Static alternative; configure the corresponding client first.
 $result = Clans::info(
     clanIds: [$clanId],
+    accessToken: $token,
+    extra: ['private.online_members'],
 );
 $data = $result->data();
 
 // Prepare for multiget; instance and static alternatives (no I/O).
 $operation = $client->clans()->prepareInfo(
     clanIds: [$clanId],
+    accessToken: $token,
+    extra: ['private.online_members'],
 );
 $operation = Clans::prepareInfo(
     clanIds: [$clanId],
+    accessToken: $token,
+    extra: ['private.online_members'],
 );
 ```
 
