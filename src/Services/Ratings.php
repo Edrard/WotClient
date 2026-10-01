@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Services;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final readonly class Ratings extends Service
 {
     /**
-     * ratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/types. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
-    public function types(string|null $language = null, array $fields = [], string|null $battleType = null): ApiResult
-    {
+    public function types(
+        string|null $language = null,
+        array $fields = [],
+        string|null $battleType = null,
+    ): array {
         return $this->client->request(
             'ratings/types',
             [
@@ -33,9 +34,9 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/types. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTypes(
         string|null $language = null,
@@ -54,10 +55,11 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/dates. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $accountIds
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function dates(
         string $type,
@@ -65,7 +67,7 @@ final readonly class Ratings extends Service
         array $fields = [],
         string|null $battleType = null,
         array $accountIds = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'ratings/dates',
             [
@@ -80,10 +82,10 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/dates. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $accountIds
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareDates(
         string $type,
@@ -106,19 +108,21 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/accounts; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/accounts. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<int> $accountIds
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function accounts(
         string $type,
         array $accountIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
         string|null $battleType = null,
         int|string|null $date = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'ratings/accounts',
             [
@@ -129,19 +133,20 @@ final readonly class Ratings extends Service
                 'battle_type' => $battleType,
                 'date' => $date,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * ratings/accounts; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/accounts. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<int> $accountIds
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareAccounts(
         string $type,
         array $accountIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
         string|null $battleType = null,
@@ -157,14 +162,15 @@ final readonly class Ratings extends Service
                 'battle_type' => $battleType,
                 'date' => $date,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * ratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/neighbors. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function neighbors(
         string $type,
@@ -175,7 +181,7 @@ final readonly class Ratings extends Service
         string|null $battleType = null,
         int|string|null $date = null,
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'ratings/neighbors',
             [
@@ -193,9 +199,9 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/neighbors. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareNeighbors(
         string $type,
@@ -224,9 +230,10 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/top. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function top(
         string $type,
@@ -237,7 +244,7 @@ final readonly class Ratings extends Service
         int|string|null $date = null,
         int|null $limit = null,
         int|null $pageNo = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'ratings/top',
             [
@@ -255,9 +262,9 @@ final readonly class Ratings extends Service
     }
 
     /**
-     * ratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * ratings/top. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTop(
         string $type,
@@ -282,73 +289,6 @@ final readonly class Ratings extends Service
                 'page_no' => $pageNo,
             ],
             null,
-        );
-    }
-
-    /**
-     * ratings/top; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
-     */
-    public function iterateTop(
-        string $type,
-        string $rankField,
-        string|null $language = null,
-        array $fields = [],
-        string|null $battleType = null,
-        int|string|null $date = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'ratings/top',
-            [
-                'type' => $type,
-                'rank_field' => $rankField,
-                'language' => $language,
-                'fields' => $fields,
-                'battle_type' => $battleType,
-                'date' => $date,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * ratings/top; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
-     */
-    public function allTop(
-        string $type,
-        string $rankField,
-        string|null $language = null,
-        array $fields = [],
-        string|null $battleType = null,
-        int|string|null $date = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'ratings/top',
-            [
-                'type' => $type,
-                'rank_field' => $rankField,
-                'language' => $language,
-                'fields' => $fields,
-                'battle_type' => $battleType,
-                'date' => $date,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
         );
     }
 

@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Services;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final readonly class Encyclopedia extends Service
 {
     /**
-     * encyclopedia/tanks; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tanks. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
-    public function tanks(string|null $language = null, array $fields = []): ApiResult
-    {
+    public function tanks(
+        string|null $language = null,
+        array $fields = [],
+    ): array {
         return $this->client->request(
             'encyclopedia/tanks',
             [
@@ -32,12 +32,14 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tanks; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tanks. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
-    public function prepareTanks(string|null $language = null, array $fields = []): PreparedOperation
-    {
+    public function prepareTanks(
+        string|null $language = null,
+        array $fields = [],
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/tanks',
             [
@@ -49,13 +51,18 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankinfo. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<int> $tankIds
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
-    public function tankInfo(array $tankIds, string|null $language = null, array $fields = []): ApiResult
-    {
+    public function tankInfo(
+        array $tankIds,
+        int $batchSize,
+        string|null $language = null,
+        array $fields = [],
+    ): array {
         return $this->client->request(
             'encyclopedia/tankinfo',
             [
@@ -63,18 +70,22 @@ final readonly class Encyclopedia extends Service
                 'language' => $language,
                 'fields' => $fields,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * encyclopedia/tankinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankinfo. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<int> $tankIds
      * @param list<string> $fields
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
-    public function prepareTankInfo(array $tankIds, string|null $language = null, array $fields = []): PreparedOperation
-    {
+    public function prepareTankInfo(
+        array $tankIds,
+        int $batchSize,
+        string|null $language = null,
+        array $fields = [],
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/tankinfo',
             [
@@ -82,17 +93,18 @@ final readonly class Encyclopedia extends Service
                 'language' => $language,
                 'fields' => $fields,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * encyclopedia/vehicles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/vehicles. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<int> $tankIds
      * @param list<string> $nation
      * @param list<string> $type
      * @param list<int> $tier
+     * @return list<FetchResult>
      */
     public function vehicles(
         array $fields = [],
@@ -103,7 +115,7 @@ final readonly class Encyclopedia extends Service
         array $nation = [],
         array $type = [],
         array $tier = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/vehicles',
             [
@@ -121,7 +133,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/vehicles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/vehicles. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<int> $tankIds
      * @param list<string> $nation
@@ -155,81 +167,9 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/vehicles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/vehicleprofile. Return one raw result per URL.
      * @param list<string> $fields
-     * @param list<int> $tankIds
-     * @param list<string> $nation
-     * @param list<string> $type
-     * @param list<int> $tier
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateVehicles(
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $tankIds = [],
-        array $nation = [],
-        array $type = [],
-        array $tier = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'encyclopedia/vehicles',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'tank_id' => $tankIds,
-                'nation' => $nation,
-                'type' => $type,
-                'tier' => $tier,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * encyclopedia/vehicles; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<int> $tankIds
-     * @param list<string> $nation
-     * @param list<string> $type
-     * @param list<int> $tier
-     */
-    public function allVehicles(
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $tankIds = [],
-        array $nation = [],
-        array $type = [],
-        array $tier = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'encyclopedia/vehicles',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'tank_id' => $tankIds,
-                'nation' => $nation,
-                'type' => $type,
-                'tier' => $tier,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * encyclopedia/vehicleprofile; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function vehicleProfile(
         int $tankId,
@@ -241,7 +181,7 @@ final readonly class Encyclopedia extends Service
         int|null $turretId = null,
         int|null $radioId = null,
         string|null $profileId = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/vehicleprofile',
             [
@@ -260,7 +200,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/vehicleprofile; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/vehicleprofile. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareVehicleProfile(
@@ -292,18 +232,19 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankengines; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankengines. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function tankEngines(
         string|null $language = null,
         array $fields = [],
         array $moduleIds = [],
         array $nation = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/tankengines',
             [
@@ -317,11 +258,11 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankengines; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankengines. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTankEngines(
         string|null $language = null,
@@ -342,18 +283,19 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankturrets; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankturrets. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function tankTurrets(
         string|null $language = null,
         array $fields = [],
         array $moduleIds = [],
         array $nation = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/tankturrets',
             [
@@ -367,11 +309,11 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankturrets; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankturrets. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTankTurrets(
         string|null $language = null,
@@ -392,18 +334,19 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankradios; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankradios. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function tankRadios(
         string|null $language = null,
         array $fields = [],
         array $moduleIds = [],
         array $nation = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/tankradios',
             [
@@ -417,11 +360,11 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankradios; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankradios. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTankRadios(
         string|null $language = null,
@@ -442,18 +385,19 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankchassis; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankchassis. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function tankChassis(
         string|null $language = null,
         array $fields = [],
         array $moduleIds = [],
         array $nation = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/tankchassis',
             [
@@ -467,11 +411,11 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankchassis; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankchassis. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTankChassis(
         string|null $language = null,
@@ -492,11 +436,12 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankguns; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankguns. Return one raw result per URL.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
+     * @return list<FetchResult>
      */
     public function tankGuns(
         string|null $language = null,
@@ -505,7 +450,7 @@ final readonly class Encyclopedia extends Service
         array $nation = [],
         int|null $turretId = null,
         int|null $tankId = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/tankguns',
             [
@@ -521,11 +466,11 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/tankguns; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/tankguns. Prepare without HTTP I/O.
+     * @deprecated Marked deprecated in the WG catalog; requests remain available.
      * @param list<string> $fields
      * @param list<int> $moduleIds
      * @param list<string> $nation
-     * @deprecated WG marks this endpoint deprecated; requires explicit client opt-in.
      */
     public function prepareTankGuns(
         string|null $language = null,
@@ -550,11 +495,14 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/achievements; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/achievements. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function achievements(array $fields = [], string|null $language = null): ApiResult
-    {
+    public function achievements(
+        array $fields = [],
+        string|null $language = null,
+    ): array {
         return $this->client->request(
             'encyclopedia/achievements',
             [
@@ -566,11 +514,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/achievements; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/achievements. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public function prepareAchievements(array $fields = [], string|null $language = null): PreparedOperation
-    {
+    public function prepareAchievements(
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/achievements',
             [
@@ -582,11 +532,14 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/info; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/info. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function info(array $fields = [], string|null $language = null): ApiResult
-    {
+    public function info(
+        array $fields = [],
+        string|null $language = null,
+    ): array {
         return $this->client->request(
             'encyclopedia/info',
             [
@@ -598,11 +551,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/info; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/info. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public function prepareInfo(array $fields = [], string|null $language = null): PreparedOperation
-    {
+    public function prepareInfo(
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/info',
             [
@@ -614,11 +569,14 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/arenas; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/arenas. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function arenas(array $fields = [], string|null $language = null): ApiResult
-    {
+    public function arenas(
+        array $fields = [],
+        string|null $language = null,
+    ): array {
         return $this->client->request(
             'encyclopedia/arenas',
             [
@@ -630,11 +588,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/arenas; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/arenas. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public function prepareArenas(array $fields = [], string|null $language = null): PreparedOperation
-    {
+    public function prepareArenas(
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/arenas',
             [
@@ -646,10 +606,11 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/provisions; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/provisions. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $type
      * @param list<int> $provisionIds
+     * @return list<FetchResult>
      */
     public function provisions(
         array $fields = [],
@@ -658,7 +619,7 @@ final readonly class Encyclopedia extends Service
         int|null $limit = null,
         array $type = [],
         array $provisionIds = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/provisions',
             [
@@ -674,7 +635,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/provisions; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/provisions. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $type
      * @param list<int> $provisionIds
@@ -702,73 +663,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/provisions; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $type
-     * @param list<int> $provisionIds
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateProvisions(
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $type = [],
-        array $provisionIds = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'encyclopedia/provisions',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'type' => $type,
-                'provision_id' => $provisionIds,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * encyclopedia/provisions; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $type
-     * @param list<int> $provisionIds
-     */
-    public function allProvisions(
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $type = [],
-        array $provisionIds = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'encyclopedia/provisions',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'type' => $type,
-                'provision_id' => $provisionIds,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * encyclopedia/personalmissions; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/personalmissions. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<int> $campaignIds
      * @param list<int> $operationIds
      * @param list<int> $setIds
      * @param list<string> $tag
+     * @return list<FetchResult>
      */
     public function personalMissions(
         array $fields = [],
@@ -777,7 +678,7 @@ final readonly class Encyclopedia extends Service
         array $operationIds = [],
         array $setIds = [],
         array $tag = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/personalmissions',
             [
@@ -793,7 +694,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/personalmissions; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/personalmissions. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<int> $campaignIds
      * @param list<int> $operationIds
@@ -823,11 +724,14 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/boosters; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/boosters. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function boosters(array $fields = [], string|null $language = null): ApiResult
-    {
+    public function boosters(
+        array $fields = [],
+        string|null $language = null,
+    ): array {
         return $this->client->request(
             'encyclopedia/boosters',
             [
@@ -839,11 +743,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/boosters; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/boosters. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public function prepareBoosters(array $fields = [], string|null $language = null): PreparedOperation
-    {
+    public function prepareBoosters(
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/boosters',
             [
@@ -855,15 +761,16 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/vehicleprofiles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/vehicleprofiles. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function vehicleProfiles(
         int $tankId,
         array $fields = [],
         string|null $language = null,
         string|null $orderBy = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/vehicleprofiles',
             [
@@ -877,7 +784,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/vehicleprofiles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/vehicleprofiles. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareVehicleProfiles(
@@ -899,12 +806,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/modules; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/modules. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $extra
      * @param list<int> $moduleIds
      * @param list<string> $type
      * @param list<string> $nation
+     * @return list<FetchResult>
      */
     public function modules(
         array $fields = [],
@@ -915,7 +823,7 @@ final readonly class Encyclopedia extends Service
         array $moduleIds = [],
         array $type = [],
         array $nation = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/modules',
             [
@@ -933,7 +841,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/modules; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/modules. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $extra
      * @param list<int> $moduleIds
@@ -967,84 +875,14 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/modules; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/badges. Return one raw result per URL.
      * @param list<string> $fields
-     * @param list<string> $extra
-     * @param list<int> $moduleIds
-     * @param list<string> $type
-     * @param list<string> $nation
-     * @return Generator<array-key, Record|null>
+     * @return list<FetchResult>
      */
-    public function iterateModules(
+    public function badges(
         array $fields = [],
-        array $extra = [],
         string|null $language = null,
-        int|null $limit = null,
-        array $moduleIds = [],
-        array $type = [],
-        array $nation = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'encyclopedia/modules',
-            [
-                'fields' => $fields,
-                'extra' => $extra,
-                'language' => $language,
-                'limit' => $limit,
-                'module_id' => $moduleIds,
-                'type' => $type,
-                'nation' => $nation,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * encyclopedia/modules; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $extra
-     * @param list<int> $moduleIds
-     * @param list<string> $type
-     * @param list<string> $nation
-     */
-    public function allModules(
-        array $fields = [],
-        array $extra = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $moduleIds = [],
-        array $type = [],
-        array $nation = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'encyclopedia/modules',
-            [
-                'fields' => $fields,
-                'extra' => $extra,
-                'language' => $language,
-                'limit' => $limit,
-                'module_id' => $moduleIds,
-                'type' => $type,
-                'nation' => $nation,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * encyclopedia/badges; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function badges(array $fields = [], string|null $language = null): ApiResult
-    {
+    ): array {
         return $this->client->request(
             'encyclopedia/badges',
             [
@@ -1056,11 +894,13 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/badges; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/badges. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public function prepareBadges(array $fields = [], string|null $language = null): PreparedOperation
-    {
+    public function prepareBadges(
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/badges',
             [
@@ -1072,12 +912,16 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/crewroles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/crewroles. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $role
+     * @return list<FetchResult>
      */
-    public function crewRoles(array $fields = [], string|null $language = null, array $role = []): ApiResult
-    {
+    public function crewRoles(
+        array $fields = [],
+        string|null $language = null,
+        array $role = [],
+    ): array {
         return $this->client->request(
             'encyclopedia/crewroles',
             [
@@ -1090,12 +934,15 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/crewroles; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/crewroles. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $role
      */
-    public function prepareCrewRoles(array $fields = [], string|null $language = null, array $role = []): PreparedOperation
-    {
+    public function prepareCrewRoles(
+        array $fields = [],
+        string|null $language = null,
+        array $role = [],
+    ): PreparedOperation {
         return $this->client->prepare(
             'encyclopedia/crewroles',
             [
@@ -1108,16 +955,17 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/crewskills; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/crewskills. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $skill
+     * @return list<FetchResult>
      */
     public function crewSkills(
         array $fields = [],
         string|null $language = null,
         array $skill = [],
         string|null $role = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'encyclopedia/crewskills',
             [
@@ -1131,7 +979,7 @@ final readonly class Encyclopedia extends Service
     }
 
     /**
-     * encyclopedia/crewskills; see the official reference linked in docs/ENDPOINTS.md.
+     * encyclopedia/crewskills. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $skill
      */

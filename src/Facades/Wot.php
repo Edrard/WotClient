@@ -23,28 +23,23 @@ final class Wot
         self::$client = null;
     }
 
+    public static function setLanguage(string $language): void
+    {
+        self::client()->setLanguage($language);
+    }
+
     /**
      * @param array<int|string, \edrard\WotClient\PreparedOperation> $operations
-     * @return array<int|string, \edrard\WotClient\OperationOutcome>
+     * @return array<int|string, list<\edrard\WgGetter\FetchResult>>
      */
-    public static function executeMany(#[\SensitiveParameter] array $operations, int $concurrency = 10): array
+    public static function executeMany(#[\SensitiveParameter] array $operations): array
     {
-        return self::client()->executeMany($operations, $concurrency);
+        return self::client()->executeMany($operations);
     }
 
     public static function client(): WotClient
     {
         return self::$client ?? throw new LogicException('Configure the Wot facade before use.');
-    }
-
-    /**
-     * @param array<array-key, int|string> $values
-     * @param array<string, mixed> $parameters
-     * @return list<\edrard\WotClient\PreparedOperation>
-     */
-    public static function prepareBatch(string $path, #[\SensitiveParameter] array $values, int $batchSize, #[\SensitiveParameter] array $parameters = [], #[\SensitiveParameter] ?\edrard\WgAuth\AccessToken $accessToken = null): array
-    {
-        return self::client()->prepareBatch($path, $values, $batchSize, $parameters, $accessToken);
     }
 
     public static function forRealm(Realm $realm): WotClient
@@ -83,9 +78,5 @@ final class Wot
     public static function ratings(): \edrard\WotClient\Services\Ratings
     {
         return self::client()->ratings();
-    }
-    public static function auth(): \edrard\WgAuth\AuthClient
-    {
-        return self::client()->auth();
     }
 }

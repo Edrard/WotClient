@@ -11,15 +11,35 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: WotClient
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: WotClient
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: Edrard/WgApi
+          ref: master
+          path: WgApi
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: Edrard/WgDataGetter
+          ref: master
+          path: WgDataGetter
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: '8.5'
           extensions: curl, ctype, filter, session, dom, mbstring, xml, xmlwriter
           tools: composer:v2
           coverage: none
-      - run: composer install --no-interaction --prefer-dist
+      - name: Install with unpublished 3.x sibling dependencies
+        run: |
+          composer config repositories.wgapi '{"type":"path","url":"../WgApi"}'
+          composer config repositories.wggetter '{"type":"path","url":"../WgDataGetter"}'
+          composer require --no-update 'edrard/wgapi:^3.0@dev' 'edrard/wggetter:^3.0@dev'
+          composer install --no-interaction --prefer-dist
       - run: composer validate --strict
       - run: composer dump-autoload --optimize --strict-psr
       - run: composer check-platform-reqs
@@ -29,6 +49,6 @@ jobs:
       - run: composer audit --locked
       - name: Verify generated signatures
         run: |
-          python3 tools/generate-endpoints.py
+          node tools/generate-client.mjs
           composer format
           git diff --exit-code -- src/Services src/Facades docs/ENDPOINTS.md docs/METHODS.md

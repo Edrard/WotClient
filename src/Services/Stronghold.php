@@ -4,23 +4,25 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Services;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final readonly class Stronghold extends Service
 {
     /**
-     * stronghold/claninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * stronghold/claninfo. Return one raw result per URL.
      * @param list<int> $clanIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function clanInfo(array $clanIds, array $fields = [], string|null $language = null): ApiResult
-    {
+    public function clanInfo(
+        array $clanIds,
+        int $batchSize,
+        array $fields = [],
+        string|null $language = null,
+    ): array {
         return $this->client->request(
             'stronghold/claninfo',
             [
@@ -28,17 +30,21 @@ final readonly class Stronghold extends Service
                 'fields' => $fields,
                 'language' => $language,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * stronghold/claninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * stronghold/claninfo. Prepare without HTTP I/O.
      * @param list<int> $clanIds
      * @param list<string> $fields
      */
-    public function prepareClanInfo(array $clanIds, array $fields = [], string|null $language = null): PreparedOperation
-    {
+    public function prepareClanInfo(
+        array $clanIds,
+        int $batchSize,
+        array $fields = [],
+        string|null $language = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'stronghold/claninfo',
             [
@@ -46,69 +52,48 @@ final readonly class Stronghold extends Service
                 'fields' => $fields,
                 'language' => $language,
             ],
+            $batchSize,
+        );
+    }
+
+    /**
+     * stronghold/clanreserves. Return one raw result per URL.
+     * @param list<string> $fields
+     * @return list<FetchResult>
+     */
+    public function clanReserves(
+        #[SensitiveParameter] string $accessToken,
+        array $fields = [],
+        string|null $language = null,
+    ): array {
+        return $this->client->request(
+            'stronghold/clanreserves',
+            [
+                'access_token' => $accessToken,
+                'fields' => $fields,
+                'language' => $language,
+            ],
             null,
         );
     }
 
     /**
-     * stronghold/clanreserves; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function clanReserves(
-        #[SensitiveParameter] AccessToken $accessToken,
-        array $fields = [],
-        string|null $language = null,
-    ): ApiResult {
-        return $this->client->request(
-            'stronghold/clanreserves',
-            [
-                'fields' => $fields,
-                'language' => $language,
-            ],
-            $accessToken,
-        );
-    }
-
-    /**
-     * stronghold/clanreserves; see the official reference linked in docs/ENDPOINTS.md.
+     * stronghold/clanreserves. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareClanReserves(
-        #[SensitiveParameter] AccessToken $accessToken,
+        #[SensitiveParameter] string $accessToken,
         array $fields = [],
         string|null $language = null,
     ): PreparedOperation {
         return $this->client->prepare(
             'stronghold/clanreserves',
             [
+                'access_token' => $accessToken,
                 'fields' => $fields,
                 'language' => $language,
             ],
-            $accessToken,
-        );
-    }
-
-    /**
-     * stronghold/activateclanreserve; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * Activates a real clan reserve. No automatic retries; a timeout has an unknown outcome.
-     */
-    public function activateClanReserve(
-        #[SensitiveParameter] AccessToken $accessToken,
-        string $reserveType,
-        int $reserveLevel,
-        array $fields = [],
-        string|null $language = null,
-    ): ApiResult {
-        return $this->client->request(
-            'stronghold/activateclanreserve',
-            [
-                'reserve_type' => $reserveType,
-                'reserve_level' => $reserveLevel,
-                'fields' => $fields,
-                'language' => $language,
-            ],
-            $accessToken,
+            null,
         );
     }
 

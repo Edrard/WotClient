@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Facades;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final class Clans
 {
     /**
-     * clans/list; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/list. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public static function search(
         string|null $language = null,
@@ -24,12 +22,12 @@ final class Clans
         string|null $search = null,
         int|null $limit = null,
         int|null $pageNo = null,
-    ): ApiResult {
+    ): array {
         return Wot::client()->clans()->search($language, $fields, $search, $limit, $pageNo);
     }
 
     /**
-     * clans/list; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/list. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public static function prepareSearch(
@@ -43,156 +41,132 @@ final class Clans
     }
 
     /**
-     * clans/list; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public static function iterateSearch(
-        string|null $language = null,
-        array $fields = [],
-        string|null $search = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return Wot::client()->clans()->iterateSearch(
-            $language,
-            $fields,
-            $search,
-            $limit,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * clans/list; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public static function allSearch(
-        string|null $language = null,
-        array $fields = [],
-        string|null $search = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return Wot::client()->clans()->allSearch($language, $fields, $search, $limit, $startPage, $maxPages);
-    }
-
-    /**
-     * clans/info; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/info. Return one raw result per URL.
      * @param list<int> $clanIds
      * @param list<string> $fields
      * @param list<string> $extra
+     * @return list<FetchResult>
      */
     public static function info(
         array $clanIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         array $extra = [],
         string|null $membersKey = null,
-    ): ApiResult {
-        return Wot::client()->clans()->info($clanIds, $language, $fields, $accessToken, $extra, $membersKey);
+    ): array {
+        return Wot::client()->clans()->info($clanIds, $batchSize, $language, $fields, $accessToken, $extra, $membersKey);
     }
 
     /**
-     * clans/info; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/info. Prepare without HTTP I/O.
      * @param list<int> $clanIds
      * @param list<string> $fields
      * @param list<string> $extra
      */
     public static function prepareInfo(
         array $clanIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         array $extra = [],
         string|null $membersKey = null,
     ): PreparedOperation {
-        return Wot::client()->clans()->prepareInfo(
-            $clanIds,
-            $language,
-            $fields,
-            $accessToken,
-            $extra,
-            $membersKey,
-        );
+        return Wot::client()->clans()->prepareInfo($clanIds, $batchSize, $language, $fields, $accessToken, $extra, $membersKey);
     }
 
     /**
-     * clans/accountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/accountinfo. Return one raw result per URL.
      * @param list<int> $accountIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public static function accountInfo(array $accountIds, string|null $language = null, array $fields = []): ApiResult
-    {
-        return Wot::client()->clans()->accountInfo($accountIds, $language, $fields);
+    public static function accountInfo(
+        array $accountIds,
+        int $batchSize,
+        string|null $language = null,
+        array $fields = [],
+    ): array {
+        return Wot::client()->clans()->accountInfo($accountIds, $batchSize, $language, $fields);
     }
 
     /**
-     * clans/accountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/accountinfo. Prepare without HTTP I/O.
      * @param list<int> $accountIds
      * @param list<string> $fields
      */
     public static function prepareAccountInfo(
         array $accountIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
     ): PreparedOperation {
-        return Wot::client()->clans()->prepareAccountInfo($accountIds, $language, $fields);
+        return Wot::client()->clans()->prepareAccountInfo($accountIds, $batchSize, $language, $fields);
     }
 
     /**
-     * clans/glossary; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/glossary. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public static function glossary(string|null $language = null, array $fields = []): ApiResult
-    {
+    public static function glossary(
+        string|null $language = null,
+        array $fields = [],
+    ): array {
         return Wot::client()->clans()->glossary($language, $fields);
     }
 
     /**
-     * clans/glossary; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/glossary. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public static function prepareGlossary(string|null $language = null, array $fields = []): PreparedOperation
-    {
+    public static function prepareGlossary(
+        string|null $language = null,
+        array $fields = [],
+    ): PreparedOperation {
         return Wot::client()->clans()->prepareGlossary($language, $fields);
     }
 
     /**
-     * clans/messageboard; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/messageboard. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public static function messageboard(#[SensitiveParameter] AccessToken $accessToken, array $fields = []): ApiResult
-    {
+    public static function messageboard(
+        #[SensitiveParameter] string $accessToken,
+        array $fields = [],
+    ): array {
         return Wot::client()->clans()->messageboard($accessToken, $fields);
     }
 
     /**
-     * clans/messageboard; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/messageboard. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public static function prepareMessageboard(
-        #[SensitiveParameter] AccessToken $accessToken,
+        #[SensitiveParameter] string $accessToken,
         array $fields = [],
     ): PreparedOperation {
         return Wot::client()->clans()->prepareMessageboard($accessToken, $fields);
     }
 
     /**
-     * clans/memberhistory; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/memberhistory. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public static function memberHistory(int $accountId, string|null $language = null, array $fields = []): ApiResult
-    {
+    public static function memberHistory(
+        int $accountId,
+        string|null $language = null,
+        array $fields = [],
+    ): array {
         return Wot::client()->clans()->memberHistory($accountId, $language, $fields);
     }
 
     /**
-     * clans/memberhistory; see the official reference linked in docs/ENDPOINTS.md.
+     * clans/memberhistory. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public static function prepareMemberHistory(

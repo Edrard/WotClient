@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Services;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final readonly class ClanRatings extends Service
 {
     /**
-     * clanratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/types. Return one raw result per URL.
+     * @return list<FetchResult>
      */
-    public function types(): ApiResult
-    {
+    public function types(
+    ): array {
         return $this->client->request(
             'clanratings/types',
             [
@@ -28,10 +26,10 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/types; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/types. Prepare without HTTP I/O.
      */
-    public function prepareTypes(): PreparedOperation
-    {
+    public function prepareTypes(
+    ): PreparedOperation {
         return $this->client->prepare(
             'clanratings/types',
             [
@@ -41,10 +39,12 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/dates. Return one raw result per URL.
+     * @return list<FetchResult>
      */
-    public function dates(int|null $limit = null): ApiResult
-    {
+    public function dates(
+        int|null $limit = null,
+    ): array {
         return $this->client->request(
             'clanratings/dates',
             [
@@ -55,10 +55,11 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/dates; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/dates. Prepare without HTTP I/O.
      */
-    public function prepareDates(int|null $limit = null): PreparedOperation
-    {
+    public function prepareDates(
+        int|null $limit = null,
+    ): PreparedOperation {
         return $this->client->prepare(
             'clanratings/dates',
             [
@@ -69,16 +70,18 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/clans; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/clans. Return one raw result per URL.
      * @param list<int> $clanIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function clans(
         array $clanIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
         int|string|null $date = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'clanratings/clans',
             [
@@ -87,17 +90,18 @@ final readonly class ClanRatings extends Service
                 'fields' => $fields,
                 'date' => $date,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * clanratings/clans; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/clans. Prepare without HTTP I/O.
      * @param list<int> $clanIds
      * @param list<string> $fields
      */
     public function prepareClans(
         array $clanIds,
+        int $batchSize,
         string|null $language = null,
         array $fields = [],
         int|string|null $date = null,
@@ -110,13 +114,14 @@ final readonly class ClanRatings extends Service
                 'fields' => $fields,
                 'date' => $date,
             ],
-            null,
+            $batchSize,
         );
     }
 
     /**
-     * clanratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/neighbors. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function neighbors(
         string $rankField,
@@ -125,7 +130,7 @@ final readonly class ClanRatings extends Service
         array $fields = [],
         int|string|null $date = null,
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'clanratings/neighbors',
             [
@@ -141,7 +146,7 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/neighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/neighbors. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareNeighbors(
@@ -167,8 +172,9 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/top. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function top(
         string $rankField,
@@ -177,7 +183,7 @@ final readonly class ClanRatings extends Service
         int|string|null $date = null,
         int|null $pageNo = null,
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'clanratings/top',
             [
@@ -193,7 +199,7 @@ final readonly class ClanRatings extends Service
     }
 
     /**
-     * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
+     * clanratings/top. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareTop(
@@ -215,63 +221,6 @@ final readonly class ClanRatings extends Service
                 'limit' => $limit,
             ],
             null,
-        );
-    }
-
-    /**
-     * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateTop(
-        string $rankField,
-        string|null $language = null,
-        array $fields = [],
-        int|string|null $date = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'clanratings/top',
-            [
-                'rank_field' => $rankField,
-                'language' => $language,
-                'fields' => $fields,
-                'date' => $date,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * clanratings/top; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allTop(
-        string $rankField,
-        string|null $language = null,
-        array $fields = [],
-        int|string|null $date = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'clanratings/top',
-            [
-                'rank_field' => $rankField,
-                'language' => $language,
-                'fields' => $fields,
-                'date' => $date,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
         );
     }
 

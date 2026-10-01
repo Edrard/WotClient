@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased 3.0.0 — 2026-10-01
+
+- Capture default or per-request language in prepared operations; add instance and static setLanguage() for future calls without changing existing preparations.
+- Allow deprecated GET methods without opt-in; remove allowDeprecated and mark legacy methods in generated references and PHPDoc.
+- Make caller-supplied N/K the sole ID and exact-nickname grouping mechanism; form one URL per group through WgApi and execute all URLs through Getter together.
+- Return Getter FetchResult objects unchanged, grouped by caller operation key for mixed methods; remove WG JSON validation, result merging, pagination interpretation, client retries and quotas.
+- Keep typed GET service methods and static facades. Move auth and POST fully outside the client. This major version has not yet been tagged as a release.
+- Reuse the real Getter queue in test doubles; verify atomic append, duplicate rejection and queue consumption. Run CI against sibling 3.x source checkouts until dependency releases exist.
+
 ## 1.2.1 - 2026-09-28
 
 - Keep caller-sized batch documentation in the generated method reference and update the generator SDK version.

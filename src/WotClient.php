@@ -4,41 +4,39 @@ declare(strict_types=1);
 
 namespace edrard\WotClient;
 
+use edrard\WgApi\ApiConfiguration;
+use edrard\WgApi\GetWgApi;
 use edrard\WgApi\Realm;
-use edrard\WgAuth\AccessToken;
-use edrard\WgAuth\AuthClient;
-use edrard\WotClient\Contracts\RequestExecutorInterface;
-use edrard\WotClient\Http\DefaultRequestExecutor;
-use Generator;
+use edrard\WgApi\UrlBuilderInterface;
+use edrard\WgGetter\Contracts\DataGetterInterface;
+use edrard\WgGetter\FetchResult;
+use edrard\WgGetter\WgDataGetter;
 use InvalidArgumentException;
+use LogicException;
 use SensitiveParameter;
 
-/** Coordinates endpoint contracts; transports, authentication and collection pipelines remain separate. */
+/** Prepares WoT GET calls and passes the getter's raw results through unchanged. */
 final class WotClient
 {
     private EndpointRegistry $registry;
-    private ParameterValidator $parameters;
-    private ResponseValidator $responses;
-    private RequestExecutorInterface $executor;
-    private AuthClient $authentication;
+    private ParameterValidator $validator;
+    private UrlBuilderInterface $urls;
+    private DataGetterInterface $getter;
 
     /** @param string|array<string, string> $applicationIds */
     public function __construct(
         #[SensitiveParameter] string|array $applicationIds,
         private Realm $realm = Realm::EU,
         private string $language = 'en',
-        ?RequestExecutorInterface $executor = null,
-        ?AuthClient $authentication = null,
-        private bool $allowDeprecated = false,
+        ?UrlBuilderInterface $urls = null,
+        ?DataGetterInterface $getter = null,
     ) {
         $ids = is_string($applicationIds) ? array_fill_keys(['eu', 'na', 'asia'], $applicationIds) : $applicationIds;
-        // Reuse WG's canonical realm/ID validation even with a custom executor.
-        new \edrard\WgApi\ApiConfiguration($ids);
+        new ApiConfiguration($ids);
+        $this->urls = $urls ?? new GetWgApi($ids);
+        $this->getter = $getter ?? new WgDataGetter();
         $this->registry = new EndpointRegistry();
-        $this->parameters = new ParameterValidator();
-        $this->responses = new ResponseValidator();
-        $this->executor = $executor ?? new DefaultRequestExecutor($ids, $language);
-        $this->authentication = $authentication ?? new AuthClient($ids);
+        $this->validator = new ParameterValidator();
     }
 
     public function forRealm(Realm $realm): self
@@ -48,10 +46,10 @@ final class WotClient
         return $client;
     }
 
-    /** Existing WgAuth methods: loginLocation(), prolongate(), logout(); each takes its explicit realm/token. */
-    public function auth(): AuthClient
+    /** Changes the default for future requests and preparations on this client. */
+    public function setLanguage(string $language): void
     {
-        return $this->authentication;
+        $this->language = $language;
     }
 
     public function accounts(): Services\Accounts
@@ -88,284 +86,126 @@ final class WotClient
     }
 
     /**
-     * Only documented paths/parameters are accepted; the generated services provide named typed arguments.
+     * One invocation yields one raw FetchResult per generated URL, even when only one URL is needed.
      * @param array<string, mixed> $parameters
+     * @return list<FetchResult>
      */
-    public function request(string $path, #[SensitiveParameter] array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null): ApiResult
+    public function request(string $path, #[SensitiveParameter] array $parameters = [], ?int $batchSize = null): array
     {
-        [$endpoint, $batches] = $this->plan($path, $parameters, $accessToken);
-        $parts = [];
-        foreach ($batches as $batch) {
-            $value = $this->responses->validate($endpoint, $this->executor->execute($this->realm, $path, $batch, $accessToken, $endpoint['write']));
-            $parts[] = $value;
-        }
-        return $this->combine($endpoint, $parts);
+        return $this->executeMany(['request' => $this->prepare($path, $parameters, $batchSize)])['request'];
     }
 
     /** @param array<string, mixed> $parameters */
-    public function prepare(string $path, #[SensitiveParameter] array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null): PreparedOperation
+    public function prepare(string $path, #[SensitiveParameter] array $parameters = [], ?int $batchSize = null): PreparedOperation
     {
-        [$endpoint, , $parameters] = $this->plan($path, $parameters, $accessToken);
-        if ($endpoint['write']) {
-            throw new InvalidArgumentException('Concurrent operations are read-only; use the existing write method.');
-        }
-        return new PreparedOperation($this->realm, $path, $parameters, $accessToken);
+        $parameters = $this->withDefaultLanguage($this->registry->get($path), $parameters);
+        $operation = new PreparedOperation($this->realm, $path, $parameters, $batchSize);
+        $this->urlsFor($operation);
+        return $operation;
     }
 
     /**
-     * Mechanically split N values into caller-sized K requests, without execution or recovery.
-     * Exact account-name searches use parameter search and type=exact.
-     * @param array<array-key, int|string> $values
-     * @param array<string, mixed> $parameters
-     * @return list<PreparedOperation>
+     * Mixed methods and realms run in one getter multirequest. No result body is parsed or merged.
+     * @param array<int|string, mixed> $operations
+     * @return array<int|string, list<FetchResult>>
      */
-    public function prepareBatch(string $path, #[SensitiveParameter] array $values, int $batchSize, #[SensitiveParameter] array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null): array
+    public function executeMany(#[SensitiveParameter] array $operations): array
     {
-        $endpoint = $this->registry->get($path);
-        $names = $path === 'account/list';
-        $parameter = $names ? 'search' : $endpoint['batchParameter'];
-        $maximum = $names ? 100 : ($endpoint['parameters'][$parameter]['maxItems'] ?? null);
-        if ($parameter === null || $batchSize < 1 || $maximum === null || $batchSize > $maximum || !array_is_list($values) || array_key_exists($parameter, $parameters)) {
-            throw new InvalidArgumentException('Invalid batch parameter or size for this endpoint.');
-        }
-        $operations = [];
-        foreach (array_chunk($values, $batchSize) as $chunk) {
-            if ($names) {
-                foreach ($chunk as $name) {
-                    if (!is_string($name) || str_contains($name, ',')) {
-                        throw new InvalidArgumentException('Expected individual exact account names.');
-                    }
-                }
-                $parameters['type'] = 'exact';
-            }
-            $operations[] = $this->prepare($path, array_replace($parameters, [$parameter => $names ? implode(',', $chunk) : $chunk]), $accessToken);
-        }
-        return $operations;
-    }
-
-    /**
-     * @param array<int|string, PreparedOperation> $operations
-     * @return array<int|string, OperationOutcome>
-     */
-    public function executeMany(#[SensitiveParameter] array $operations, int $concurrency = 10): array
-    {
-        if ($concurrency < 1 || $concurrency > 10) {
-            throw new InvalidArgumentException('Concurrency must be between 1 and 10.');
-        }
         if ($operations === []) {
             return [];
         }
-        if (!$this->executor instanceof \edrard\WotClient\Contracts\BatchRequestExecutorInterface) {
-            throw new \LogicException('The injected executor does not support concurrent execution.');
-        }
-        $requests = [];
-        $plans = [];
+        $urls = [];
+        $indices = [];
         foreach ($operations as $key => $operation) {
-            $client = $this->forRealm($operation->realm);
-            [$endpoint, $batches] = $client->plan($operation->path, $operation->parameters(), $operation->token());
-            if ($endpoint['write']) {
-                throw new InvalidArgumentException('Concurrent operations are read-only.');
+            if (!$operation instanceof PreparedOperation) {
+                throw new InvalidArgumentException('Expected prepared WoT operations.');
             }
-            $indices = [];
-            foreach ($batches as $batch) {
-                $indices[] = count($requests);
-                $requests[] = new PreparedOperation($operation->realm, $operation->path, $batch, $operation->token());
+            $indices[$key] = [];
+            foreach ($this->urlsFor($operation) as $url) {
+                $index = count($urls);
+                $urls[$index] = $url;
+                $indices[$key][] = $index;
             }
-            $plans[$key] = [$endpoint, $batches, $indices];
         }
-        $outcomes = $this->executor->executeMany($requests, $concurrency);
-        if (array_keys($outcomes) !== array_keys($requests)) {
-            throw new ClientException('Batch executor did not preserve request identities.');
+        $raw = [];
+        if ($urls !== []) {
+            $this->getter->setUrls($urls);
+            $raw = $this->getter->getData();
         }
         $result = [];
-        foreach ($plans as $key => [$endpoint, $batches, $indices]) {
-            $parts = [];
-            $values = [];
-            $failure = null;
-            foreach ($indices as $i) {
-                $outcome = $outcomes[$i];
-                if (!$outcome->succeeded()) {
-                    $error = $outcome->failure;
-                    $partFailure = new OperationFailure($error->kind, $error->code, $error->retryable, $outcome->attempts, $error->retryAfter, $error->providerMessage);
-                    $parts[] = new OperationOutcome(null, $partFailure, request: $requests[$i]);
-                    $failure = $this->aggregateFailure($failure, $partFailure);
-                    continue;
-                }
-                try {
-                    $value = $this->responses->validate($endpoint, $outcome->envelope());
-                    $values[] = $value;
-                    $parts[] = new OperationOutcome($value, request: $requests[$i]);
-                } catch (ClientException $error) {
-                    $partFailure = new OperationFailure('invalid_response', $error->providerCode, attempts: $outcome->attempts, providerMessage: $error->providerMessage);
-                    $parts[] = new OperationOutcome(null, $partFailure, request: $requests[$i]);
-                    $failure = $this->aggregateFailure($failure, $partFailure);
-                }
+        foreach ($indices as $key => $parts) {
+            $result[$key] = [];
+            foreach ($parts as $index) {
+                $result[$key][] = $raw[$index] ?? throw new LogicException('Getter omitted a request result.');
             }
-            $result[$key] = $failure === null ? new OperationOutcome($this->combine($endpoint, $values), parts: $parts) : new OperationOutcome(null, $failure, $parts);
         }
         return $result;
     }
 
-    private function aggregateFailure(?OperationFailure $previous, OperationFailure $next): OperationFailure
+    /** @return list<string> */
+    private function urlsFor(PreparedOperation $operation): array
     {
-        if ($previous === null) {
-            return $next;
+        $endpoint = $this->registry->get($operation->path);
+        if ($endpoint['write'] || !in_array('GET', $endpoint['httpMethods'], true)) {
+            throw new InvalidArgumentException('This operation is not an HTTP GET method.');
         }
-        $selected = !$next->retryable && $previous->retryable ? $next : $previous;
-        $retryAfter = $previous->retryAfter === null && $next->retryAfter === null ? null : max($previous->retryAfter ?? 0.0, $next->retryAfter ?? 0.0);
-        return new OperationFailure($selected->kind, $selected->providerCode, $previous->retryable && $next->retryable, max($previous->attempts, $next->attempts), $retryAfter, $selected->providerMessage);
-    }
-
-    /**
-     * @param array<string, mixed> $parameters
-     * @return array{array<string, mixed>, list<array<string, mixed>>, array<string, mixed>}
-     */
-    private function plan(string $path, #[SensitiveParameter] array $parameters, #[SensitiveParameter] ?AccessToken $accessToken): array
-    {
-        $endpoint = $this->registry->get($path);
-        if (!in_array($this->realm->value, $endpoint['realms'], true)) {
+        if (!in_array($operation->realm->value, $endpoint['realms'], true)) {
             throw new InvalidArgumentException('This endpoint is unavailable in the selected realm.');
         }
-        if ($endpoint['deprecated'] && !$this->allowDeprecated) {
-            throw new ClientException('WG has deprecated this endpoint; explicit opt-in is required.');
-        }
-        $tokenAllowed = isset($endpoint['parameters']['access_token']);
-        if ($accessToken !== null && (!$tokenAllowed || $accessToken->realm !== $this->realm || $accessToken->expiresAt <= time())) {
-            throw new InvalidArgumentException('Token is unsupported, expired or belongs to another realm.');
-        }
-        if (($endpoint['parameters']['access_token']['required'] ?? false) && $accessToken === null) {
-            throw new InvalidArgumentException('An access token is required.');
-        }
-        $endpoint['hasToken'] = $accessToken !== null;
-        if (isset($endpoint['parameters']['language'])) {
-            $parameters['language'] ??= $this->language;
-        }
-        $parameters = $this->parameters->validate($endpoint, $parameters);
-        $batchParameter = $endpoint['batchParameter'];
-        $batches = [$parameters];
-        if ($batchParameter !== null) {
-            $batches = [];
-            foreach (array_chunk($parameters[$batchParameter], $endpoint['parameters'][$batchParameter]['maxItems']) as $chunk) {
-                $batches[] = array_replace($parameters, [$batchParameter => $chunk]);
+        $parameters = $this->withDefaultLanguage($endpoint, $operation->parameters());
+        if ($operation->path === 'account/list' && is_array($parameters['search'] ?? null)) {
+            if ($operation->batchSize === null || $operation->batchSize < 1 || !array_is_list($parameters['search']) || $parameters['search'] === []) {
+                throw new InvalidArgumentException('Supply names and a positive K for exact nickname batching.');
             }
+            $urls = [];
+            $parameters['type'] = 'exact';
+            foreach (array_chunk($parameters['search'], $operation->batchSize) as $names) {
+                foreach ($names as $name) {
+                    if (!is_string($name) || str_contains($name, ',')) {
+                        throw new InvalidArgumentException('Exact nicknames must be strings without commas.');
+                    }
+                }
+                $chunk = $this->validator->validate($endpoint, array_replace($parameters, ['search' => implode(',', $names)]));
+                $urls[] = $this->urls->getUrl($operation->realm->value, 'wot', $operation->path, $chunk);
+            }
+            return $urls;
         }
-        return [$endpoint, $batches, $parameters];
+        $endpoint['hasToken'] = isset($parameters['access_token']);
+        $parameters = $this->validator->validate($endpoint, $parameters);
+        $batchParameter = $endpoint['batchParameter'];
+        if ($batchParameter === null) {
+            if ($operation->batchSize !== null) {
+                throw new InvalidArgumentException('This method does not accept a batch size.');
+            }
+            return [$this->urls->getUrl($operation->realm->value, 'wot', $operation->path, $parameters)];
+        }
+        if ($operation->batchSize === null || $operation->batchSize < 1) {
+            throw new InvalidArgumentException('Supply a positive K for an ID-list method.');
+        }
+        $urls = [];
+        foreach (array_chunk($parameters[$batchParameter], $operation->batchSize) as $ids) {
+            $chunk = array_replace($parameters, [$batchParameter => $ids]);
+            $urls[] = $this->urls->getUrl($operation->realm->value, 'wot', $operation->path, $chunk);
+        }
+        return $urls;
     }
 
     /**
      * @param array<string, mixed> $endpoint
-     * @param list<ApiResult> $parts
-     */
-    private function combine(array $endpoint, array $parts): ApiResult
-    {
-        $data = [];
-        $metadata = [];
-        foreach ($parts as $i => $result) {
-            $batchParameter = $endpoint['batchParameter'];
-            if ($batchParameter !== null) {
-                $values = $result->data();
-                if (is_array($values)) {
-                    $data = array_replace($data, $values);
-                }
-            }
-            $metadata[] = $result->meta;
-        }
-        if (count($parts) === 1) {
-            return $parts[0];
-        }
-        return new ApiResult($data, ['count' => count($data), 'batches' => $metadata], parts: $parts);
-    }
-
-    /**
-     * Lazy pages. Metadata is checked; without page_total we continue until an empty page.
-     * A safety limit raises an exception instead of silently returning incomplete data.
      * @param array<string, mixed> $parameters
-     * @return Generator<int, ApiResult>
+     * @return array<string, mixed>
      */
-    public function pages(string $path, array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null, int $startPage = 1, int $maxPages = 1000): Generator
+    private function withDefaultLanguage(array $endpoint, #[SensitiveParameter] array $parameters): array
     {
-        $endpoint = $this->registry->get($path);
-        if (!isset($endpoint['parameters']['page_no']) || $startPage < 1 || $maxPages < 1 || $maxPages > 100000 || $startPage > PHP_INT_MAX - $maxPages) {
-            throw new InvalidArgumentException('Unsupported pagination or invalid page bounds.');
+        if (isset($endpoint['parameters']['language'])) {
+            $parameters['language'] ??= $this->language;
         }
-        if ($endpoint['batchParameter'] !== null) {
-            throw new InvalidArgumentException('Pagination cannot be combined with automatic ID batching.');
-        }
-        $previous = null;
-        for ($offset = 0; $offset < $maxPages; ++$offset) {
-            $page = $startPage + $offset;
-            $result = $this->request($path, array_replace($parameters, ['page_no' => $page]), $accessToken);
-            $total = $result->meta['page_total'] ?? null;
-            foreach (['page_no', 'page'] as $field) {
-                if (array_key_exists($field, $result->meta) && $result->meta[$field] !== $page) {
-                    throw new InvalidResponseException();
-                }
-            }
-            if ($total !== null && (!is_int($total) || $total < 0)) {
-                throw new InvalidResponseException();
-            }
-            if ($result->count() === 0) {
-                if ($total !== null && $page < $total) {
-                    throw new InvalidResponseException();
-                }
-                return;
-            }
-            if ($total !== null && $page > $total) {
-                throw new InvalidResponseException();
-            }
-            $fingerprint = hash('sha256', json_encode($result->data(), JSON_THROW_ON_ERROR));
-            if ($fingerprint === $previous) {
-                throw new ClientException('WG repeated a pagination page.');
-            }
-            $previous = $fingerprint;
-            yield $page => $result;
-            if ($total !== null && $page >= $total) {
-                return;
-            }
-        }
-        throw new ClientException('Pagination safety limit reached; the result is incomplete.');
-    }
-
-    /**
-     * @param array<string, mixed> $parameters
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterate(string $path, array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null, int $startPage = 1, int $maxPages = 1000): Generator
-    {
-        $position = 0;
-        foreach ($this->pages($path, $parameters, $accessToken, $startPage, $maxPages) as $page) {
-            $list = array_is_list($page->data() ?? []);
-            foreach ($page->records() as $key => $record) {
-                yield ($list ? $position++ : $key) => $record;
-            }
-        }
-    }
-
-    /** @param array<string, mixed> $parameters */
-    public function all(string $path, array $parameters = [], #[SensitiveParameter] ?AccessToken $accessToken = null, int $startPage = 1, int $maxPages = 1000): ApiResult
-    {
-        $all = [];
-        $pages = 0;
-        foreach ($this->pages($path, $parameters, $accessToken, $startPage, $maxPages) as $result) {
-            ++$pages;
-            $data = $result->data() ?? [];
-            if (array_is_list($data)) {
-                array_push($all, ...$data);
-            } else {
-                foreach ($data as $key => $record) {
-                    if (array_key_exists($key, $all)) {
-                        throw new ClientException('WG returned duplicate record keys across pages.');
-                    }
-                    $all[$key] = $record;
-                }
-            }
-        }
-        return new ApiResult($all, ['count' => count($all), 'pages' => $pages]);
+        return $parameters;
     }
 
     /** @return array<string, string> */
     public function __debugInfo(): array
     {
-        return ['realm' => $this->realm->value, 'language' => $this->language, 'credentials' => '[redacted]'];
+        return ['credentials' => '[redacted]'];
     }
 }

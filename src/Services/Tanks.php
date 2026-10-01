@@ -4,47 +4,46 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Services;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final readonly class Tanks extends Service
 {
     /**
-     * tanks/stats; see the official reference linked in docs/ENDPOINTS.md.
+     * tanks/stats. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $extra
      * @param list<int> $tankIds
+     * @return list<FetchResult>
      */
     public function stats(
         int $accountId,
         string|null $language = null,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         array $extra = [],
         array $tankIds = [],
         string|null $inGarage = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'tanks/stats',
             [
                 'account_id' => $accountId,
                 'language' => $language,
                 'fields' => $fields,
+                'access_token' => $accessToken,
                 'extra' => $extra,
                 'tank_id' => $tankIds,
                 'in_garage' => $inGarage,
             ],
-            $accessToken,
+            null,
         );
     }
 
     /**
-     * tanks/stats; see the official reference linked in docs/ENDPOINTS.md.
+     * tanks/stats. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $extra
      * @param list<int> $tankIds
@@ -53,7 +52,7 @@ final readonly class Tanks extends Service
         int $accountId,
         string|null $language = null,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         array $extra = [],
         array $tankIds = [],
         string|null $inGarage = null,
@@ -64,42 +63,45 @@ final readonly class Tanks extends Service
                 'account_id' => $accountId,
                 'language' => $language,
                 'fields' => $fields,
+                'access_token' => $accessToken,
                 'extra' => $extra,
                 'tank_id' => $tankIds,
                 'in_garage' => $inGarage,
             ],
-            $accessToken,
+            null,
         );
     }
 
     /**
-     * tanks/achievements; see the official reference linked in docs/ENDPOINTS.md.
+     * tanks/achievements. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<int> $tankIds
+     * @return list<FetchResult>
      */
     public function achievements(
         int $accountId,
         string|null $language = null,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         array $tankIds = [],
         string|null $inGarage = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'tanks/achievements',
             [
                 'account_id' => $accountId,
                 'language' => $language,
                 'fields' => $fields,
+                'access_token' => $accessToken,
                 'tank_id' => $tankIds,
                 'in_garage' => $inGarage,
             ],
-            $accessToken,
+            null,
         );
     }
 
     /**
-     * tanks/achievements; see the official reference linked in docs/ENDPOINTS.md.
+     * tanks/achievements. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<int> $tankIds
      */
@@ -107,7 +109,7 @@ final readonly class Tanks extends Service
         int $accountId,
         string|null $language = null,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         array $tankIds = [],
         string|null $inGarage = null,
     ): PreparedOperation {
@@ -117,18 +119,20 @@ final readonly class Tanks extends Service
                 'account_id' => $accountId,
                 'language' => $language,
                 'fields' => $fields,
+                'access_token' => $accessToken,
                 'tank_id' => $tankIds,
                 'in_garage' => $inGarage,
             ],
-            $accessToken,
+            null,
         );
     }
 
     /**
-     * tanks/mastery; see the official reference linked in docs/ENDPOINTS.md.
+     * tanks/mastery. Return one raw result per URL.
      * @param list<int> $percentile
      * @param list<string> $fields
      * @param list<int> $tankIds
+     * @return list<FetchResult>
      */
     public function mastery(
         string $distribution,
@@ -136,7 +140,7 @@ final readonly class Tanks extends Service
         string|null $language = null,
         array $fields = [],
         array $tankIds = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'tanks/mastery',
             [
@@ -151,7 +155,7 @@ final readonly class Tanks extends Service
     }
 
     /**
-     * tanks/mastery; see the official reference linked in docs/ENDPOINTS.md.
+     * tanks/mastery. Prepare without HTTP I/O.
      * @param list<int> $percentile
      * @param list<string> $fields
      * @param list<int> $tankIds

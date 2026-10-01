@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace edrard\WotClient\Services;
 
-use edrard\WgAuth\AccessToken;
-use edrard\WotClient\ApiResult;
 use edrard\WotClient\PreparedOperation;
-use edrard\WotClient\Record;
-use Generator;
+use edrard\WgGetter\FetchResult;
 use SensitiveParameter;
 
-/** Generated from resources/endpoints.json; regenerate with tools/generate-endpoints.py. */
+/** Generated from resources/endpoints.json by tools/generate-client.mjs. */
 final readonly class GlobalMap extends Service
 {
     /**
-     * globalmap/fronts; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/fronts. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $frontIds
+     * @return list<FetchResult>
      */
     public function fronts(
         array $fields = [],
@@ -25,7 +23,7 @@ final readonly class GlobalMap extends Service
         int|null $limit = null,
         int|null $pageNo = null,
         array $frontIds = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/fronts',
             [
@@ -40,7 +38,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/fronts; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/fronts. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $frontIds
      */
@@ -65,64 +63,10 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/fronts; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $frontIds
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateFronts(
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $frontIds = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/fronts',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'front_id' => $frontIds,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/fronts; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $frontIds
-     */
-    public function allFronts(
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        array $frontIds = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/fronts',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'front_id' => $frontIds,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/provinces; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/provinces. Return one raw result per URL.
      * @param list<string> $fields
      * @param list<string> $provinceIds
+     * @return list<FetchResult>
      */
     public function provinces(
         string $frontId,
@@ -137,7 +81,7 @@ final readonly class GlobalMap extends Service
         int|null $dailyRevenueGte = null,
         string|null $orderBy = null,
         array $provinceIds = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/provinces',
             [
@@ -159,7 +103,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/provinces; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/provinces. Prepare without HTTP I/O.
      * @param list<string> $fields
      * @param list<string> $provinceIds
      */
@@ -198,159 +142,85 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/provinces; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $provinceIds
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateProvinces(
-        string $frontId,
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        int|null $primeHour = null,
-        string|null $landingType = null,
-        string|null $arenaId = null,
-        int|null $dailyRevenueLte = null,
-        int|null $dailyRevenueGte = null,
-        string|null $orderBy = null,
-        array $provinceIds = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/provinces',
-            [
-                'front_id' => $frontId,
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'prime_hour' => $primeHour,
-                'landing_type' => $landingType,
-                'arena_id' => $arenaId,
-                'daily_revenue_lte' => $dailyRevenueLte,
-                'daily_revenue_gte' => $dailyRevenueGte,
-                'order_by' => $orderBy,
-                'province_id' => $provinceIds,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/provinces; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @param list<string> $provinceIds
-     */
-    public function allProvinces(
-        string $frontId,
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        int|null $primeHour = null,
-        string|null $landingType = null,
-        string|null $arenaId = null,
-        int|null $dailyRevenueLte = null,
-        int|null $dailyRevenueGte = null,
-        string|null $orderBy = null,
-        array $provinceIds = [],
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/provinces',
-            [
-                'front_id' => $frontId,
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-                'prime_hour' => $primeHour,
-                'landing_type' => $landingType,
-                'arena_id' => $arenaId,
-                'daily_revenue_lte' => $dailyRevenueLte,
-                'daily_revenue_gte' => $dailyRevenueGte,
-                'order_by' => $orderBy,
-                'province_id' => $provinceIds,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/claninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/claninfo. Return one raw result per URL.
      * @param list<int> $clanIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function clanInfo(
         array $clanIds,
+        int $batchSize,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
-    ): ApiResult {
+        #[SensitiveParameter] string|null $accessToken = null,
+    ): array {
         return $this->client->request(
             'globalmap/claninfo',
             [
                 'clan_id' => $clanIds,
                 'fields' => $fields,
+                'access_token' => $accessToken,
             ],
-            $accessToken,
+            $batchSize,
         );
     }
 
     /**
-     * globalmap/claninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/claninfo. Prepare without HTTP I/O.
      * @param list<int> $clanIds
      * @param list<string> $fields
      */
     public function prepareClanInfo(
         array $clanIds,
+        int $batchSize,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
     ): PreparedOperation {
         return $this->client->prepare(
             'globalmap/claninfo',
             [
                 'clan_id' => $clanIds,
                 'fields' => $fields,
+                'access_token' => $accessToken,
             ],
-            $accessToken,
+            $batchSize,
         );
     }
 
     /**
-     * globalmap/clanprovinces; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/clanprovinces. Return one raw result per URL.
      * @param list<int> $clanIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function clanProvinces(
         array $clanIds,
+        int $batchSize,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         string|null $language = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/clanprovinces',
             [
                 'clan_id' => $clanIds,
                 'fields' => $fields,
+                'access_token' => $accessToken,
                 'language' => $language,
             ],
-            $accessToken,
+            $batchSize,
         );
     }
 
     /**
-     * globalmap/clanprovinces; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/clanprovinces. Prepare without HTTP I/O.
      * @param list<int> $clanIds
      * @param list<string> $fields
      */
     public function prepareClanProvinces(
         array $clanIds,
+        int $batchSize,
         array $fields = [],
-        #[SensitiveParameter] AccessToken|null $accessToken = null,
+        #[SensitiveParameter] string|null $accessToken = null,
         string|null $language = null,
     ): PreparedOperation {
         return $this->client->prepare(
@@ -358,15 +228,17 @@ final readonly class GlobalMap extends Service
             [
                 'clan_id' => $clanIds,
                 'fields' => $fields,
+                'access_token' => $accessToken,
                 'language' => $language,
             ],
-            $accessToken,
+            $batchSize,
         );
     }
 
     /**
-     * globalmap/clanbattles; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/clanbattles. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function clanBattles(
         int $clanId,
@@ -374,7 +246,7 @@ final readonly class GlobalMap extends Service
         string|null $language = null,
         int|null $limit = null,
         int|null $pageNo = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/clanbattles',
             [
@@ -389,7 +261,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/clanbattles; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/clanbattles. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareClanBattles(
@@ -413,61 +285,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/clanbattles; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasons. Return one raw result per URL.
      * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateClanBattles(
-        int $clanId,
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/clanbattles',
-            [
-                'clan_id' => $clanId,
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/clanbattles; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allClanBattles(
-        int $clanId,
-        array $fields = [],
-        string|null $language = null,
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/clanbattles',
-            [
-                'clan_id' => $clanId,
-                'fields' => $fields,
-                'language' => $language,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/seasons; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function seasons(
         array $fields = [],
@@ -476,7 +296,7 @@ final readonly class GlobalMap extends Service
         string|null $seasonId = null,
         int|null $limit = null,
         string|null $status = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/seasons',
             [
@@ -492,7 +312,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasons; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasons. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareSeasons(
@@ -518,69 +338,17 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasons; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateSeasons(
-        array $fields = [],
-        string|null $language = null,
-        string|null $seasonId = null,
-        int|null $limit = null,
-        string|null $status = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/seasons',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'season_id' => $seasonId,
-                'limit' => $limit,
-                'status' => $status,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/seasons; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allSeasons(
-        array $fields = [],
-        string|null $language = null,
-        string|null $seasonId = null,
-        int|null $limit = null,
-        string|null $status = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/seasons',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'season_id' => $seasonId,
-                'limit' => $limit,
-                'status' => $status,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/seasonclaninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonclaninfo. Return one raw result per URL.
      * @param list<string> $vehicleLevel
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function seasonClanInfo(string $seasonId, array $vehicleLevel, int $clanId, array $fields = []): ApiResult
-    {
+    public function seasonClanInfo(
+        string $seasonId,
+        array $vehicleLevel,
+        int $clanId,
+        array $fields = [],
+    ): array {
         return $this->client->request(
             'globalmap/seasonclaninfo',
             [
@@ -594,7 +362,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonclaninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonclaninfo. Prepare without HTTP I/O.
      * @param list<string> $vehicleLevel
      * @param list<string> $fields
      */
@@ -617,16 +385,17 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonaccountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonaccountinfo. Return one raw result per URL.
      * @param list<string> $vehicleLevel
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function seasonAccountInfo(
         string $seasonId,
         array $vehicleLevel,
         int $accountId,
         array $fields = [],
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/seasonaccountinfo',
             [
@@ -640,7 +409,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonaccountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonaccountinfo. Prepare without HTTP I/O.
      * @param list<string> $vehicleLevel
      * @param list<string> $fields
      */
@@ -663,8 +432,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonrating; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonrating. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function seasonRating(
         string $seasonId,
@@ -672,7 +442,7 @@ final readonly class GlobalMap extends Service
         array $fields = [],
         int|null $pageNo = null,
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/seasonrating',
             [
@@ -687,7 +457,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonrating; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonrating. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareSeasonRating(
@@ -711,61 +481,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonrating; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonratingneighbors. Return one raw result per URL.
      * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateSeasonRating(
-        string $seasonId,
-        string $vehicleLevel,
-        array $fields = [],
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/seasonrating',
-            [
-                'season_id' => $seasonId,
-                'vehicle_level' => $vehicleLevel,
-                'fields' => $fields,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/seasonrating; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allSeasonRating(
-        string $seasonId,
-        string $vehicleLevel,
-        array $fields = [],
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/seasonrating',
-            [
-                'season_id' => $seasonId,
-                'vehicle_level' => $vehicleLevel,
-                'fields' => $fields,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/seasonratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function seasonRatingNeighbors(
         string $seasonId,
@@ -773,7 +491,7 @@ final readonly class GlobalMap extends Service
         int $clanId,
         array $fields = [],
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/seasonratingneighbors',
             [
@@ -788,7 +506,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/seasonratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/seasonratingneighbors. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareSeasonRatingNeighbors(
@@ -812,8 +530,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/events; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/events. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function events(
         array $fields = [],
@@ -822,7 +541,7 @@ final readonly class GlobalMap extends Service
         string|null $eventId = null,
         int|null $limit = null,
         string|null $status = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/events',
             [
@@ -838,7 +557,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/events; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/events. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareEvents(
@@ -864,69 +583,17 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/events; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateEvents(
-        array $fields = [],
-        string|null $language = null,
-        string|null $eventId = null,
-        int|null $limit = null,
-        string|null $status = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/events',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'event_id' => $eventId,
-                'limit' => $limit,
-                'status' => $status,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/events; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allEvents(
-        array $fields = [],
-        string|null $language = null,
-        string|null $eventId = null,
-        int|null $limit = null,
-        string|null $status = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/events',
-            [
-                'fields' => $fields,
-                'language' => $language,
-                'event_id' => $eventId,
-                'limit' => $limit,
-                'status' => $status,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventclaninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventclaninfo. Return one raw result per URL.
      * @param list<string> $frontIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function eventClanInfo(string $eventId, array $frontIds, int $clanId, array $fields = []): ApiResult
-    {
+    public function eventClanInfo(
+        string $eventId,
+        array $frontIds,
+        int $clanId,
+        array $fields = [],
+    ): array {
         return $this->client->request(
             'globalmap/eventclaninfo',
             [
@@ -940,12 +607,16 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventclaninfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventclaninfo. Prepare without HTTP I/O.
      * @param list<string> $frontIds
      * @param list<string> $fields
      */
-    public function prepareEventClanInfo(string $eventId, array $frontIds, int $clanId, array $fields = []): PreparedOperation
-    {
+    public function prepareEventClanInfo(
+        string $eventId,
+        array $frontIds,
+        int $clanId,
+        array $fields = [],
+    ): PreparedOperation {
         return $this->client->prepare(
             'globalmap/eventclaninfo',
             [
@@ -959,9 +630,10 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventaccountinfo. Return one raw result per URL.
      * @param list<string> $frontIds
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function eventAccountInfo(
         string $eventId,
@@ -969,7 +641,7 @@ final readonly class GlobalMap extends Service
         int $accountId,
         array $fields = [],
         int|null $clanId = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/eventaccountinfo',
             [
@@ -984,7 +656,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountinfo; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventaccountinfo. Prepare without HTTP I/O.
      * @param list<string> $frontIds
      * @param list<string> $fields
      */
@@ -1009,8 +681,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountratings; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventaccountratings. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function eventAccountRatings(
         string $eventId,
@@ -1019,7 +692,7 @@ final readonly class GlobalMap extends Service
         int|null $pageNo = null,
         int|null $limit = null,
         int|null $inRating = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/eventaccountratings',
             [
@@ -1035,7 +708,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountratings; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventaccountratings. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareEventAccountRatings(
@@ -1061,65 +734,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountratings; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventaccountratingneighbors. Return one raw result per URL.
      * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateEventAccountRatings(
-        string $eventId,
-        string $frontId,
-        array $fields = [],
-        int|null $limit = null,
-        int|null $inRating = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/eventaccountratings',
-            [
-                'event_id' => $eventId,
-                'front_id' => $frontId,
-                'fields' => $fields,
-                'limit' => $limit,
-                'in_rating' => $inRating,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventaccountratings; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allEventAccountRatings(
-        string $eventId,
-        string $frontId,
-        array $fields = [],
-        int|null $limit = null,
-        int|null $inRating = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/eventaccountratings',
-            [
-                'event_id' => $eventId,
-                'front_id' => $frontId,
-                'fields' => $fields,
-                'limit' => $limit,
-                'in_rating' => $inRating,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventaccountratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function eventAccountRatingNeighbors(
         string $eventId,
@@ -1129,7 +746,7 @@ final readonly class GlobalMap extends Service
         int|null $pageNo = null,
         int|null $limit = null,
         int|null $neighboursCount = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/eventaccountratingneighbors',
             [
@@ -1146,7 +763,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventaccountratingneighbors. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareEventAccountRatingNeighbors(
@@ -1174,69 +791,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventaccountratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventrating. Return one raw result per URL.
      * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateEventAccountRatingNeighbors(
-        string $eventId,
-        string $frontId,
-        int $accountId,
-        array $fields = [],
-        int|null $limit = null,
-        int|null $neighboursCount = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/eventaccountratingneighbors',
-            [
-                'event_id' => $eventId,
-                'front_id' => $frontId,
-                'account_id' => $accountId,
-                'fields' => $fields,
-                'limit' => $limit,
-                'neighbours_count' => $neighboursCount,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventaccountratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allEventAccountRatingNeighbors(
-        string $eventId,
-        string $frontId,
-        int $accountId,
-        array $fields = [],
-        int|null $limit = null,
-        int|null $neighboursCount = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/eventaccountratingneighbors',
-            [
-                'event_id' => $eventId,
-                'front_id' => $frontId,
-                'account_id' => $accountId,
-                'fields' => $fields,
-                'limit' => $limit,
-                'neighbours_count' => $neighboursCount,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventrating; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function eventRating(
         string $eventId,
@@ -1244,7 +801,7 @@ final readonly class GlobalMap extends Service
         array $fields = [],
         int|null $pageNo = null,
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/eventrating',
             [
@@ -1259,7 +816,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventrating; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventrating. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareEventRating(
@@ -1283,61 +840,9 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventrating; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventratingneighbors. Return one raw result per URL.
      * @param list<string> $fields
-     * @return Generator<array-key, Record|null>
-     */
-    public function iterateEventRating(
-        string $eventId,
-        string $frontId,
-        array $fields = [],
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): Generator {
-        return $this->client->iterate(
-            'globalmap/eventrating',
-            [
-                'event_id' => $eventId,
-                'front_id' => $frontId,
-                'fields' => $fields,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventrating; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
-     */
-    public function allEventRating(
-        string $eventId,
-        string $frontId,
-        array $fields = [],
-        int|null $limit = null,
-        int $startPage = 1,
-        int $maxPages = 1000,
-    ): ApiResult {
-        return $this->client->all(
-            'globalmap/eventrating',
-            [
-                'event_id' => $eventId,
-                'front_id' => $frontId,
-                'fields' => $fields,
-                'limit' => $limit,
-            ],
-            null,
-            $startPage,
-            $maxPages,
-        );
-    }
-
-    /**
-     * globalmap/eventratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
-     * @param list<string> $fields
+     * @return list<FetchResult>
      */
     public function eventRatingNeighbors(
         string $eventId,
@@ -1345,7 +850,7 @@ final readonly class GlobalMap extends Service
         int $clanId,
         array $fields = [],
         int|null $limit = null,
-    ): ApiResult {
+    ): array {
         return $this->client->request(
             'globalmap/eventratingneighbors',
             [
@@ -1360,7 +865,7 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/eventratingneighbors; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/eventratingneighbors. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
     public function prepareEventRatingNeighbors(
@@ -1384,11 +889,13 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/info; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/info. Return one raw result per URL.
      * @param list<string> $fields
+     * @return list<FetchResult>
      */
-    public function info(array $fields = []): ApiResult
-    {
+    public function info(
+        array $fields = [],
+    ): array {
         return $this->client->request(
             'globalmap/info',
             [
@@ -1399,11 +906,12 @@ final readonly class GlobalMap extends Service
     }
 
     /**
-     * globalmap/info; see the official reference linked in docs/ENDPOINTS.md.
+     * globalmap/info. Prepare without HTTP I/O.
      * @param list<string> $fields
      */
-    public function prepareInfo(array $fields = []): PreparedOperation
-    {
+    public function prepareInfo(
+        array $fields = [],
+    ): PreparedOperation {
         return $this->client->prepare(
             'globalmap/info',
             [

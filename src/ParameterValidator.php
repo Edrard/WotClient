@@ -19,7 +19,7 @@ final class ParameterValidator
     {
         $schemas = $endpoint['parameters'];
         foreach ($parameters as $name => $value) {
-            if (!isset($schemas[$name]) || $name === 'access_token' || $name === 'application_id') {
+            if (!isset($schemas[$name]) || $name === 'application_id') {
                 throw new InvalidArgumentException('Unknown or reserved WoT parameter.');
             }
             if ($value === null || $value === []) {
@@ -71,7 +71,6 @@ final class ParameterValidator
                 }
             }
             if ($list) {
-                $items = array_values(array_unique($items, SORT_REGULAR));
                 if ($name !== $endpoint['batchParameter'] && $schema['maxItems'] !== null && count($items) > $schema['maxItems']) {
                     throw new InvalidArgumentException('Parameter list is too large: '.$name);
                 }
@@ -79,16 +78,13 @@ final class ParameterValidator
             }
         }
         foreach ($schemas as $name => $schema) {
-            if ($schema['required'] && $name !== 'access_token' && !array_key_exists($name, $parameters)) {
+            if ($schema['required'] && !array_key_exists($name, $parameters)) {
                 throw new InvalidArgumentException('Required parameter is missing: '.$name);
             }
         }
         if ($endpoint['path'] === 'account/list') {
             $type = $parameters['type'] ?? 'startswith';
             $terms = $type === 'exact' ? explode(',', $parameters['search']) : [$parameters['search']];
-            if (count($terms) > 100) {
-                throw new InvalidArgumentException('Too many exact player names.');
-            }
             foreach ($terms as $term) {
                 $length = strlen($term);
                 if ($length < ($type === 'exact' ? 1 : 3) || $length > 24) {
