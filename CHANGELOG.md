@@ -2,6 +2,7 @@
 
 ## Unreleased 3.0.0 — 2026-10-01
 
+- Reject conflicting explicit search types for nickname arrays instead of silently replacing them with exact; document exact batching and mixed prefix searches.
 - Capture default or per-request language in prepared operations; add instance and static setLanguage() for future calls without changing existing preparations.
 - Allow deprecated GET methods without opt-in; remove allowDeprecated and mark legacy methods in generated references and PHPDoc.
 - Make caller-supplied N/K the sole ID and exact-nickname grouping mechanism; form one URL per group through WgApi and execute all URLs through Getter together.

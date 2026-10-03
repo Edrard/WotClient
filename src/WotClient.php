@@ -154,6 +154,9 @@ final class WotClient
         }
         $parameters = $this->withDefaultLanguage($endpoint, $operation->parameters());
         if ($operation->path === 'account/list' && is_array($parameters['search'] ?? null)) {
+            if (($parameters['type'] ?? 'exact') !== 'exact') {
+                throw new InvalidArgumentException('Nickname batches require type=exact; use separate search operations for startswith.');
+            }
             if ($operation->batchSize === null || $operation->batchSize < 1 || !array_is_list($parameters['search']) || $parameters['search'] === []) {
                 throw new InvalidArgumentException('Supply names and a positive K for exact nickname batching.');
             }

@@ -14,6 +14,7 @@ use edrard\WgGetter\WgDataGetter;
 use edrard\WotClient\Facades\Accounts;
 use edrard\WotClient\Facades\Wot;
 use edrard\WotClient\WotClient;
+use edrard\WotClient\PreparedOperation;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
@@ -98,6 +99,76 @@ final class ClientContractTest extends TestCase
         self::assertSame('Alpha,Bravo', $first['search']);
         self::assertSame('Charlie', $second['search']);
         self::assertSame('exact', $first['type']);
+    }
+
+    public function testNicknameBatchesRejectConflictingTypesBeforeHttp(): void
+    {
+        $getter = new RecordingGetter();
+        $client = new WotClient('app-id', getter: $getter);
+
+        foreach (['startswith', 'invalid', '', 0, false, []] as $type) {
+            try {
+                $client->request('account/list', ['search' => ['Edr', 'Jov'], 'type' => $type], 2);
+                self::fail('A conflicting search type must not be replaced with exact.');
+            } catch (InvalidArgumentException $exception) {
+                self::assertStringContainsString('type=exact', $exception->getMessage());
+            }
+        }
+        self::assertSame([], $getter->waves);
+    }
+
+    public function testDirectlyConstructedNicknameOperationCannotOverrideSearchType(): void
+    {
+        $getter = new RecordingGetter();
+        $client = new WotClient('app-id', getter: $getter);
+        $operation = new PreparedOperation(Realm::EU, 'account/list', ['search' => ['Edr', 'Jov'], 'type' => 'startswith'], 2);
+
+        try {
+            $client->executeMany(['prefixes' => $operation]);
+            self::fail('Manually constructed operations must obey the same search contract.');
+        } catch (InvalidArgumentException $exception) {
+            self::assertStringContainsString('type=exact', $exception->getMessage());
+        }
+        self::assertSame([], $getter->waves);
+    }
+
+    public function testGenericNicknameBatchesKeepExactDefaultAndExplicitExact(): void
+    {
+        $getter = new RecordingGetter();
+        $client = new WotClient('app-id', getter: $getter);
+
+        foreach ([[], ['type' => null], ['type' => 'exact']] as $parameters) {
+            $results = $client->request('account/list', ['search' => ['Alpha', 'Bravo', 'Charlie']] + $parameters, 2);
+            self::assertCount(2, $results);
+        }
+        self::assertCount(3, $getter->waves);
+        foreach ($getter->waves as $wave) {
+            parse_str((string) parse_url($wave[0], PHP_URL_QUERY), $first);
+            parse_str((string) parse_url($wave[1], PHP_URL_QUERY), $second);
+            self::assertSame('Alpha,Bravo', $first['search']);
+            self::assertSame('Charlie', $second['search']);
+            self::assertSame('exact', $first['type']);
+            self::assertSame('exact', $second['type']);
+        }
+    }
+
+    public function testSeparatePrefixSearchesExecuteTogetherWithoutChangingType(): void
+    {
+        $getter = new RecordingGetter();
+        $client = new WotClient('app-id', getter: $getter);
+        $results = $client->executeMany([
+            'edr' => $client->accounts()->prepareSearch('Edr', type: 'startswith'),
+            'jov' => $client->accounts()->prepareSearch('Jov', type: 'startswith'),
+        ]);
+
+        self::assertSame(['edr', 'jov'], array_keys($results));
+        self::assertCount(1, $getter->waves);
+        self::assertCount(2, $getter->waves[0]);
+        foreach (['Edr', 'Jov'] as $index => $prefix) {
+            parse_str((string) parse_url($getter->waves[0][$index], PHP_URL_QUERY), $query);
+            self::assertSame($prefix, $query['search']);
+            self::assertSame('startswith', $query['type']);
+        }
     }
 
     public function testCallerIdentifiersAreNotSilentlyDeduplicated(): void

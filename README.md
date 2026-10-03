@@ -42,6 +42,35 @@ $results = $client->accounts()->searchExactMany(
 // Two URLs, submitted to Getter together: Alpha,Bravo and Charlie.
 ```
 
+For `account/list`, an array of names represents an **exact** nickname batch. Generic `request()` and `prepare()` accept `type: 'exact'`, or an omitted/null type that defaults to `exact` for this array form. Any other explicit type raises `InvalidArgumentException` before HTTP execution; the client never replaces an explicit `startswith` with `exact`.
+
+For prefix searches, pass one string per operation and send the prepared operations together:
+
+```php
+$results = $client->accounts()->search(search: 'Edr', type: 'startswith');
+// One URL with search=Edr and type=startswith.
+
+$results = $client->executeMany([
+    'edr' => $client->accounts()->prepareSearch(search: 'Edr', type: 'startswith'),
+    'jov' => $client->accounts()->prepareSearch(search: 'Jov', type: 'startswith'),
+]);
+// Two URLs in one multirequest; both keep type=startswith.
+// Raw results are available as $results['edr'][0] and $results['jov'][0].
+```
+
+This conflicting generic call is rejected:
+
+```php
+try {
+    $client->request('account/list', [
+        'search' => ['Edr', 'Jov'],
+        'type' => 'startswith',
+    ], batchSize: 2);
+} catch (\InvalidArgumentException $exception) {
+    // No HTTP request was sent. Use separate prepareSearch() operations above.
+}
+```
+
 For a method without an ID list, one call builds one URL and still returns a one-element list of `FetchResult`. Page numbers are ordinary request parameters; the client does not automatically walk pages or interpret `meta`.
 
 ## Default and per-request language
